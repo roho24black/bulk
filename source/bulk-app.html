@@ -29,10 +29,12 @@
   }
 
   #header{
-    position:fixed; top:calc(16px + env(safe-area-inset-top)); left:0; right:0;
+    position:fixed; top:calc(16px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%);
     text-align:center; font-size:13px; font-weight:800; letter-spacing:0.16em;
-    opacity:0.4; z-index:5; pointer-events:none;
+    opacity:0.45; z-index:5; background:none; border:none; color:inherit; font-family:inherit;
+    padding:6px 12px; cursor:pointer;
   }
+  #header:active{opacity:0.7;}
 
   /* ---------- HATCH SCREEN ---------- */
   #hatch{
@@ -60,6 +62,25 @@
     background:var(--body2); color:white; font-size:16px; font-weight:600;
     box-shadow:0 6px 16px rgba(0,0,0,0.15);
   }
+
+  /* ---------- RESET / CHANGE PET CONFIRM ---------- */
+  #resetOverlay{
+    position:fixed; inset:0; background:rgba(20,20,25,0.4); z-index:30;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity 0.2s;
+  }
+  #resetOverlay.show{opacity:1; pointer-events:auto;}
+  .confirm-card{
+    background:white; color:#2c3a36; border-radius:22px; padding:26px 22px;
+    max-width:280px; text-align:center; box-shadow:0 24px 48px rgba(0,0,0,0.25);
+    transform:scale(0.92); transition:transform 0.2s;
+  }
+  #resetOverlay.show .confirm-card{transform:scale(1);}
+  .confirm-card p{margin:0 0 18px; font-size:15px; line-height:1.4; font-weight:600;}
+  .confirm-actions{display:flex; gap:10px; justify-content:center;}
+  .confirm-btn{border:none; border-radius:999px; padding:11px 18px; font-size:14px; font-weight:700; cursor:pointer;}
+  .confirm-btn.secondary{background:#eef1f0; color:#2c3a36;}
+  .confirm-btn.primary{background:#3fc9a4; color:white;}
 
   /* ---------- MAIN SCREEN ---------- */
   #stage{position:relative; width:min(90vw,320px); height:280px; display:flex; align-items:center; justify-content:center;}
@@ -100,6 +121,7 @@
   .creature.mood-gloomy .face-gloomy{display:block;}
   .creature.mood-hungry .face-hungry{display:block;}
   .creature.mood-bored .face-bored{display:block;}
+  .creature.mood-dizzy .face-dizzy{display:block;}
 
   .scar{display:none;}
   .creature.has-scar .scar{display:block;}
@@ -114,6 +136,9 @@
   .sparkle{animation:sparkle 1.4s ease-in-out infinite;}
   @keyframes sparkle{0%,100%{opacity:0.4; transform:scale(0.8)}50%{opacity:1; transform:scale(1.15)}}
 
+  .spiral-eye{animation:spin 0.85s linear infinite; transform-box:fill-box; transform-origin:center;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
   .creature.bounce #bodyGroup{animation:bounce 0.7s ease;}
   @keyframes bounce{0%{transform:translateY(0) scale(1,1)}30%{transform:translateY(-18px) scale(1.05,0.95)}55%{transform:translateY(0) scale(0.96,1.06)}100%{transform:translateY(0) scale(1,1)}}
   .creature.mood-ecstatic #bodyGroup{animation:bobble 1.1s ease-in-out infinite;}
@@ -122,7 +147,9 @@
   .creature.mood-gloomy #bodyGroup{transform:scaleY(0.85) translateY(10px); opacity:0.75;}
   .creature.mood-bored #bodyGroup{transform:scaleY(0.95) translateY(3px);}
   .creature.mood-playful #bodyGroup{animation:tilt 1.8s ease-in-out infinite;}
+  .creature.mood-dizzy #bodyGroup{animation:wobble 0.5s ease-in-out infinite;}
   @keyframes tilt{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+  @keyframes wobble{0%,100%{transform:rotate(-6deg) translateX(-3px)}50%{transform:rotate(6deg) translateX(3px)}}
   .creature:not(.bounce) #bodyGroup{animation-fill-mode:both;}
   #bodyGroup{transform-origin:100px 118px; animation:idle 3.4s ease-in-out infinite;}
   @keyframes idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
@@ -135,14 +162,35 @@
   .poop-inner.cleaning{animation:poopClean 0.3s ease forwards;}
   @keyframes poopClean{to{transform:scale(0) rotate(25deg); opacity:0;}}
 
-  /* per-action micro effects */
+  /* per-action micro effects — 2 random variants each, plus rare jackpot confetti */
   .fx{display:none; pointer-events:none;}
-  .creature.fx-feed .fx-feed-el{display:block; animation:fxFood 0.9s ease forwards;}
-  .creature.fx-play .fx-play-el{display:block; animation:fxBall 0.9s ease forwards;}
-  .creature.fx-pet .fx-pet-el{display:block; animation:fxHearts 0.9s ease forwards;}
+  .creature.fx-feed-a .fx-feed-a-el{display:block; animation:fxFood 0.9s ease forwards;}
+  .creature.fx-feed-b .fx-feed-b-el{display:block; animation:fxCrumbs 0.9s ease forwards;}
+  .creature.fx-play-a .fx-play-a-el{display:block; animation:fxBall 0.9s ease forwards;}
+  .creature.fx-play-b .fx-play-b-el{display:block; animation:fxStar 0.9s ease forwards;}
+  .creature.fx-pet-a .fx-pet-a-el{display:block; animation:fxHearts 0.9s ease forwards;}
+  .creature.fx-pet-b .fx-pet-b-el{display:block; animation:fxRing 0.9s ease forwards;}
   @keyframes fxFood{0%{opacity:0; transform:translateY(6px) scale(0.5);}30%{opacity:1; transform:translateY(-4px) scale(1.1);}70%{opacity:1;}100%{opacity:0; transform:translateY(-16px) scale(0.8);}}
+  @keyframes fxCrumbs{0%{opacity:0; transform:scale(0.3);}30%{opacity:1; transform:scale(1);}100%{opacity:0; transform:scale(1) translateY(12px);}}
   @keyframes fxBall{0%{opacity:0; transform:translate(0,0) scale(0.6);}20%{opacity:1;}50%{transform:translate(-8px,-20px) scale(1);}75%{transform:translate(8px,-6px) scale(0.95);}100%{opacity:0; transform:translate(0,6px) scale(0.7);}}
+  @keyframes fxStar{0%{opacity:0; transform:translate(-36px,4px) rotate(0) scale(0.6);}30%{opacity:1;}100%{opacity:0; transform:translate(36px,-14px) rotate(220deg) scale(1);}}
   @keyframes fxHearts{0%{opacity:0; transform:translateY(4px) scale(0.5);}30%{opacity:1;}100%{opacity:0; transform:translateY(-30px) scale(1.05);}}
+  @keyframes fxRing{0%{opacity:0.9; transform:scale(0.4);}100%{opacity:0; transform:scale(2.1);}}
+
+  .creature.fx-jackpot .fx-jackpot-el{display:block;}
+  .fx-jackpot-el .confetti{opacity:0;}
+  .fx-jackpot-el .c1{animation:confettiBurst1 1s ease-out forwards;}
+  .fx-jackpot-el .c2{animation:confettiBurst2 1s ease-out forwards;}
+  .fx-jackpot-el .c3{animation:confettiBurst3 1s ease-out forwards;}
+  .fx-jackpot-el .c4{animation:confettiBurst4 1s ease-out forwards;}
+  .fx-jackpot-el .c5{animation:confettiBurst5 1s ease-out forwards;}
+  .fx-jackpot-el .c6{animation:confettiBurst6 1s ease-out forwards;}
+  @keyframes confettiBurst1{0%{opacity:0; transform:translate(0,0) scale(0.4);}20%{opacity:1;}100%{opacity:0; transform:translate(-42px,-32px) scale(1) rotate(180deg);}}
+  @keyframes confettiBurst2{0%{opacity:0; transform:translate(0,0) scale(0.4);}20%{opacity:1;}100%{opacity:0; transform:translate(2px,-48px) scale(1) rotate(-160deg);}}
+  @keyframes confettiBurst3{0%{opacity:0; transform:translate(0,0) scale(0.4);}20%{opacity:1;}100%{opacity:0; transform:translate(42px,-30px) scale(1) rotate(200deg);}}
+  @keyframes confettiBurst4{0%{opacity:0; transform:translate(0,0) scale(0.4);}20%{opacity:1;}100%{opacity:0; transform:translate(-36px,14px) scale(1) rotate(-140deg);}}
+  @keyframes confettiBurst5{0%{opacity:0; transform:translate(0,0) scale(0.4);}20%{opacity:1;}100%{opacity:0; transform:translate(2px,30px) scale(1) rotate(160deg);}}
+  @keyframes confettiBurst6{0%{opacity:0; transform:translate(0,0) scale(0.4);}20%{opacity:1;}100%{opacity:0; transform:translate(36px,14px) scale(1) rotate(-200deg);}}
 
   /* speech bubble */
   #bubbleWrap{
@@ -177,7 +225,7 @@
 </head>
 <body>
 
-<div id="header">БУЛЬК</div>
+<button id="header" type="button">БУЛЬК</button>
 
 <div id="hatch">
   <div id="eggWrap">
@@ -192,6 +240,16 @@
     <div id="hatchCreatureWrap"></div>
     <div id="hatchName"></div>
     <button id="hatchBtn">Продолжить</button>
+  </div>
+</div>
+
+<div id="resetOverlay">
+  <div class="confirm-card">
+    <p id="resetText">Отпустить текущего питомца и вылупить нового?</p>
+    <div class="confirm-actions">
+      <button class="confirm-btn secondary" id="resetCancel">Остаться</button>
+      <button class="confirm-btn primary" id="resetConfirmBtn">Отпустить</button>
+    </div>
   </div>
 </div>
 
@@ -292,6 +350,11 @@
             <path d="M108,114 Q116,110 124,114" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
             <line x1="88" y1="140" x2="112" y2="140" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
           </g>
+          <g class="face face-dizzy">
+            <g transform="translate(83,113)"><g class="spiral-eye"><circle r="7" fill="none" stroke="var(--ink)" stroke-width="2"/><circle r="2.6" cx="2.4" cy="-2.4" fill="none" stroke="var(--ink)" stroke-width="2"/></g></g>
+            <g transform="translate(117,113)"><g class="spiral-eye"><circle r="7" fill="none" stroke="var(--ink)" stroke-width="2"/><circle r="2.6" cx="2.4" cy="-2.4" fill="none" stroke="var(--ink)" stroke-width="2"/></g></g>
+            <path d="M82,138 Q88,132 94,138 Q100,144 106,138 Q112,132 118,138" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+          </g>
         </g>
       </g>
 
@@ -304,16 +367,35 @@
         </g>
       </g>
 
-      <g class="fx fx-feed-el" transform="translate(100,150)">
+      <g class="fx fx-feed-a-el" transform="translate(100,150)">
         <circle r="7" fill="#ff8fa3"/>
         <circle r="7" fill="#ffd15c" transform="translate(6,-2)"/>
       </g>
-      <g class="fx fx-play-el" transform="translate(152,120)">
+      <g class="fx fx-feed-b-el" transform="translate(100,148)">
+        <circle class="crumb" r="3" fill="#c98a4b" transform="translate(-10,-4)"/>
+        <circle class="crumb" r="3" fill="#c98a4b" transform="translate(9,-9)"/>
+        <circle class="crumb" r="3" fill="#c98a4b" transform="translate(1,7)"/>
+      </g>
+      <g class="fx fx-play-a-el" transform="translate(152,120)">
         <circle r="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
         <circle r="2" fill="var(--ink)"/>
       </g>
-      <g class="fx fx-pet-el" transform="translate(100,88)">
+      <g class="fx fx-play-b-el" transform="translate(100,110)">
+        <polygon points="0,-12 3,-3 12,-3 5,3 8,12 0,6 -8,12 -5,3 -12,-3 -3,-3" fill="#ffd15c"/>
+      </g>
+      <g class="fx fx-pet-a-el" transform="translate(100,88)">
         <path d="M-13,0 c0,-7 11,-7 13,-2 c2,-5 13,-5 13,2 c0,7 -13,13 -13,13 c0,0 -13,-6 -13,-13 Z" fill="#ff8fa3"/>
+      </g>
+      <g class="fx fx-pet-b-el" transform="translate(100,116)">
+        <circle r="60" fill="none" stroke="#ff8fa3" stroke-width="3"/>
+      </g>
+      <g class="fx fx-jackpot-el" transform="translate(100,110)">
+        <circle class="confetti c1" r="4" fill="#ff8fa3"/>
+        <rect class="confetti c2" x="-3" y="-3" width="6" height="6" fill="#ffd15c"/>
+        <circle class="confetti c3" r="4" fill="#8fe8cf"/>
+        <rect class="confetti c4" x="-3" y="-3" width="6" height="6" fill="#b89aff"/>
+        <circle class="confetti c5" r="4" fill="#5cb3ff"/>
+        <rect class="confetti c6" x="-3" y="-3" width="6" height="6" fill="#ff8a4c"/>
       </g>
     </svg>
   </div>
@@ -349,6 +431,7 @@
 <script>
 (function(){
   const STORAGE_KEY = 'bulk_state_v1';
+  const COLLECTION_KEY = 'bulk_collection_v1';
 
   const SPECIES = [
     {id:'drop',    name:'Капля',    weight:32, colors:['#8fe8cf','#3fc9a4'], bg:['#eafaf6','#d6f5ec']},
@@ -428,7 +511,30 @@
       "Просто существую. Как обычно.",
       "У меня было видение. Забыл, о чём.",
       "Иногда я просто вибрирую. Без причины."
-    ]
+    ],
+    jackpot: [
+      "ЭТО БЫЛ ЛУЧШИЙ МОМЕНТ МОЕЙ ЖИЗНИ.",
+      "Кажется, я только что телепортировался от радости.",
+      "Всё вокруг стало ярче. Это нормально?",
+      "У меня внутри салют. Настоящий."
+    ],
+    overload: {
+      feed: [
+        "Я СЕЙЧАС ЛОПНУ.",
+        "Так, стоп, я наелся на неделю вперёд.",
+        "Ещё одна конфета и я взорвусь. В хорошем смысле?"
+      ],
+      play: [
+        "У меня кружится голова!!",
+        "Притормози, чемпион.",
+        "Я больше не чувствую ног. У меня их и не было."
+      ],
+      pet: [
+        "Ладно-ладно, я понял, ты меня любишь!",
+        "Ещё одно поглаживание и я растаю в лужу.",
+        "Хватит! ...шучу, не хватит, продолжай."
+      ]
+    }
   };
 
   function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
@@ -452,6 +558,7 @@
 
   let state = loadState();
   let reunion = false;
+  const combo = {kind:null, count:0, time:0};
 
   function createNewPet(){
     const sp = weightedPick(SPECIES);
@@ -544,10 +651,18 @@
 
   function playEffect(kind){
     const c = document.getElementById('creature');
-    const cls = 'fx-' + kind;
+    const variant = Math.random()<0.5 ? 'a' : 'b';
+    const cls = 'fx-' + kind + '-' + variant;
     c.classList.remove(cls); void c.offsetWidth;
     c.classList.add(cls);
     setTimeout(()=>c.classList.remove(cls), 900);
+  }
+
+  function playJackpot(){
+    const c = document.getElementById('creature');
+    c.classList.remove('fx-jackpot'); void c.offsetWidth;
+    c.classList.add('fx-jackpot');
+    setTimeout(()=>c.classList.remove('fx-jackpot'), 1000);
   }
 
   function checkGrowth(){
@@ -588,13 +703,33 @@
     if(state.totalInteractions>=30) state.auraUnlocked = true;
     if(state.streakDays>=5) state.accessoryUnlocked = true;
     saveState(state);
-    const mood = state.totalInteractions % 4 === 0 ? 'ecstatic' : 'playful';
+
+    // rapid-tap tracking (session-only) — spam the same button and the pet notices
+    if(kind===combo.kind && now-combo.time<1300){ combo.count++; } else { combo.count=1; }
+    combo.kind = kind; combo.time = now;
+
+    const isOverload = combo.count>=4;
+    const isJackpot = !isOverload && Math.random()<0.1;
+
+    let mood, line;
+    if(isOverload){
+      mood = 'dizzy';
+      line = pick(LINES.overload[kind]);
+    } else if(isJackpot){
+      mood = 'ecstatic';
+      line = pick(LINES.jackpot);
+    } else {
+      mood = state.totalInteractions % 4 === 0 ? 'ecstatic' : 'playful';
+      line = pick(LINES[kind]);
+    }
+
     render(mood);
     bounce();
     playEffect(kind);
-    showBubble(pick(LINES[kind]));
+    if(isJackpot) playJackpot();
+    showBubble(line);
     clearTimeout(interact._t);
-    interact._t = setTimeout(()=>render(computeMood(state,false)), 2200);
+    interact._t = setTimeout(()=>render(computeMood(state,false)), isOverload?2600:2200);
   }
 
   function tick(){
@@ -603,7 +738,31 @@
     checkGrowth();
   }
 
+  function openResetConfirm(){
+    if(!state) return;
+    const sp = speciesById(state.species), tr = traitById(state.trait);
+    document.getElementById('resetText').textContent =
+      'Отпустить «' + sp.name + '» (' + tr.name.toLowerCase() + ') и вылупить нового?';
+    document.getElementById('resetOverlay').classList.add('show');
+  }
+  function closeResetConfirm(){
+    document.getElementById('resetOverlay').classList.remove('show');
+  }
+  function releasePet(){
+    try{
+      const collection = JSON.parse(localStorage.getItem(COLLECTION_KEY) || '[]');
+      collection.push({species: state.species, trait: state.trait, hatchedAt: state.createdAt, releasedAt: Date.now()});
+      localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection));
+    }catch(e){}
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+
   function boot(){
+    document.getElementById('header').addEventListener('click', openResetConfirm);
+    document.getElementById('resetCancel').addEventListener('click', closeResetConfirm);
+    document.getElementById('resetConfirmBtn').addEventListener('click', releasePet);
+
     const isNew = !state;
     if(isNew){
       document.getElementById('hatch').classList.remove('hidden');
