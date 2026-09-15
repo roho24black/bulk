@@ -63,24 +63,62 @@
     box-shadow:0 6px 16px rgba(0,0,0,0.15);
   }
 
-  /* ---------- RESET / CHANGE PET CONFIRM ---------- */
-  #resetOverlay{
+  /* ---------- OVERLAYS (shared look) ---------- */
+  .overlay{
     position:fixed; inset:0; background:rgba(20,20,25,0.4); z-index:30;
     display:flex; align-items:center; justify-content:center;
     opacity:0; pointer-events:none; transition:opacity 0.2s;
   }
-  #resetOverlay.show{opacity:1; pointer-events:auto;}
+  .overlay.show{opacity:1; pointer-events:auto;}
+
   .confirm-card{
     background:white; color:#2c3a36; border-radius:22px; padding:26px 22px;
     max-width:280px; text-align:center; box-shadow:0 24px 48px rgba(0,0,0,0.25);
     transform:scale(0.92); transition:transform 0.2s;
   }
-  #resetOverlay.show .confirm-card{transform:scale(1);}
+  .overlay.show .confirm-card{transform:scale(1);}
   .confirm-card p{margin:0 0 18px; font-size:15px; line-height:1.4; font-weight:600;}
   .confirm-actions{display:flex; gap:10px; justify-content:center;}
   .confirm-btn{border:none; border-radius:999px; padding:11px 18px; font-size:14px; font-weight:700; cursor:pointer;}
   .confirm-btn.secondary{background:#eef1f0; color:#2c3a36;}
   .confirm-btn.primary{background:#3fc9a4; color:white;}
+
+  /* ---------- HEADER MENU ---------- */
+  .menu-card{
+    background:white; color:#2c3a36; border-radius:22px; padding:10px; width:260px;
+    box-shadow:0 24px 48px rgba(0,0,0,0.25);
+    transform:scale(0.92); transition:transform 0.2s;
+  }
+  .overlay.show .menu-card{transform:scale(1);}
+  .menu-row{
+    display:flex; align-items:center; gap:10px; width:100%; padding:13px 12px;
+    background:none; border:none; font-size:15px; font-weight:600; color:#2c3a36;
+    text-align:left; border-radius:12px; cursor:pointer; font-family:inherit;
+  }
+  .menu-row:active{background:#f0f3f2;}
+  .menu-sep{height:1px; background:#eef1f0; margin:4px 8px;}
+  .menu-cancel{
+    margin-top:4px; width:100%; padding:12px; background:#f5f5f5; border:none;
+    border-radius:12px; font-weight:700; font-size:14px; color:#2c3a36; cursor:pointer; font-family:inherit;
+  }
+
+  /* ---------- COLLECTION ---------- */
+  #collectionOverlay{align-items:flex-end;}
+  .collection-panel{
+    background:white; color:#2c3a36; width:100%; max-width:420px; border-radius:24px 24px 0 0;
+    padding:20px; max-height:72vh; display:flex; flex-direction:column;
+    transform:translateY(24px); transition:transform 0.2s;
+  }
+  #collectionOverlay.show .collection-panel{transform:translateY(0);}
+  .collection-header{display:flex; align-items:center; justify-content:space-between; font-weight:800; font-size:16px; margin-bottom:14px;}
+  #collectionClose{border:none; background:#f0f3f2; width:30px; height:30px; border-radius:50%; font-size:14px; cursor:pointer; color:#2c3a36;}
+  #collectionList{overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-bottom:env(safe-area-inset-bottom);}
+  .collection-item{display:flex; align-items:center; gap:12px; padding:10px; border-radius:14px; background:#f7f9f8;}
+  .collection-dot{width:34px; height:34px; border-radius:50%; flex-shrink:0;}
+  .collection-info{display:flex; flex-direction:column;}
+  .collection-name{font-weight:700; font-size:14px;}
+  .collection-dates{font-size:12px; opacity:0.55;}
+  .collection-empty{text-align:center; opacity:0.5; padding:30px 10px; font-size:14px; line-height:1.5;}
 
   /* ---------- MAIN SCREEN ---------- */
   #stage{position:relative; width:min(90vw,320px); height:280px; display:flex; align-items:center; justify-content:center;}
@@ -243,13 +281,34 @@
   </div>
 </div>
 
-<div id="resetOverlay">
+<div id="menuOverlay" class="overlay">
+  <div class="menu-card">
+    <button class="menu-row" id="menuRename">✏️&nbsp;&nbsp;Переименовать</button>
+    <button class="menu-row" id="menuCollection">📚&nbsp;&nbsp;Коллекция</button>
+    <button class="menu-row" id="menuSound">🔊&nbsp;&nbsp;<span id="menuSoundLabel">Звук: вкл</span></button>
+    <div class="menu-sep"></div>
+    <button class="menu-row" id="menuRelease">🥚&nbsp;&nbsp;Отпустить питомца</button>
+    <button class="menu-cancel" id="menuCancel">Отмена</button>
+  </div>
+</div>
+
+<div id="resetOverlay" class="overlay">
   <div class="confirm-card">
     <p id="resetText">Отпустить текущего питомца и вылупить нового?</p>
     <div class="confirm-actions">
       <button class="confirm-btn secondary" id="resetCancel">Остаться</button>
       <button class="confirm-btn primary" id="resetConfirmBtn">Отпустить</button>
     </div>
+  </div>
+</div>
+
+<div id="collectionOverlay" class="overlay">
+  <div class="collection-panel">
+    <div class="collection-header">
+      <span>Коллекция</span>
+      <button id="collectionClose">✕</button>
+    </div>
+    <div id="collectionList"></div>
   </div>
 </div>
 
@@ -432,6 +491,7 @@
 (function(){
   const STORAGE_KEY = 'bulk_state_v1';
   const COLLECTION_KEY = 'bulk_collection_v1';
+  const SETTINGS_KEY = 'bulk_settings_v1';
 
   const SPECIES = [
     {id:'drop',    name:'Капля',    weight:32, colors:['#8fe8cf','#3fc9a4'], bg:['#eafaf6','#d6f5ec']},
@@ -510,13 +570,22 @@
     idle: [
       "Просто существую. Как обычно.",
       "У меня было видение. Забыл, о чём.",
-      "Иногда я просто вибрирую. Без причины."
+      "Иногда я просто вибрирую. Без причины.",
+      "Если долго смотреть на меня, я начинаю нервничать.",
+      "Придумал шутку. Забыл шутку.",
+      "Который час? Неважно, у меня нет часов."
     ],
     jackpot: [
       "ЭТО БЫЛ ЛУЧШИЙ МОМЕНТ МОЕЙ ЖИЗНИ.",
       "Кажется, я только что телепортировался от радости.",
       "Всё вокруг стало ярче. Это нормально?",
       "У меня внутри салют. Настоящий."
+    ],
+    combo: [
+      "ИДЕАЛЬНЫЙ УХОД! Ты знаешь секрет.",
+      "Погладил, покормил, поиграл — ты профи.",
+      "Это было по науке. Мне нравится.",
+      "Комбо! Если бы тут были очки, я бы их насчитал."
     ],
     overload: {
       feed: [
@@ -553,19 +622,71 @@
   }
   function saveState(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
 
+  function loadSettings(){
+    try{ return Object.assign({sound:true}, JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')); }
+    catch(e){ return {sound:true}; }
+  }
+  function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+
   function speciesById(id){ return SPECIES.find(s=>s.id===id); }
   function traitById(id){ return TRAITS.find(t=>t.id===id); }
 
   let state = loadState();
+  let settings = loadSettings();
   let reunion = false;
   const combo = {kind:null, count:0, time:0};
+  const seqCombo = [];
+
+  /* ---------- sound engine (tiny Web Audio synth, no assets) ---------- */
+  let actx = null;
+  function ctx(){
+    if(!actx){
+      try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; }
+    }
+    if(actx.state==='suspended') actx.resume().catch(()=>{});
+    return actx;
+  }
+  function beep(freq, dur, delay, type, gain){
+    if(!settings.sound) return;
+    const c = ctx();
+    if(!c) return;
+    try{
+      const t0 = c.currentTime + (delay||0);
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = type||'sine';
+      osc.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(gain||0.12, t0+0.015);
+      g.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+      osc.connect(g).connect(c.destination);
+      osc.start(t0);
+      osc.stop(t0+dur+0.02);
+    }catch(e){}
+  }
+  function playSound(kind){
+    if(!settings.sound) return;
+    if(kind==='feed'){ beep(520,0.11,0,'sine'); beep(680,0.12,0.09,'sine'); }
+    else if(kind==='play'){ beep(720,0.08,0,'triangle'); }
+    else if(kind==='pet'){ beep(440,0.16,0,'sine',0.09); }
+    else if(kind==='clean'){ beep(360,0.09,0,'square',0.06); }
+    else if(kind==='growth'){ beep(392,0.1,0,'sine'); beep(523,0.14,0.09,'sine'); }
+    else if(kind==='idle'){ beep(330,0.09,0,'sine',0.05); }
+    else if(kind==='hatch'){ beep(523,0.1,0,'sine'); beep(659,0.1,0.1,'sine'); beep(784,0.16,0.2,'sine'); }
+    else if(kind==='jackpot'){ [523,659,784,1046].forEach((f,i)=>beep(f,0.14,i*0.08,'triangle',0.1)); }
+    else if(kind==='overload'){ [300,260,220].forEach((f,i)=>beep(f,0.14,i*0.09,'sawtooth',0.07)); }
+    else if(kind==='combo'){ [523,659,784,1046,1318].forEach((f,i)=>beep(f,0.12,i*0.06,'triangle',0.1)); }
+  }
+  function vibrate(pattern){
+    try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+  }
 
   function createNewPet(){
     const sp = weightedPick(SPECIES);
     const tr = pick(TRAITS);
     const now = Date.now();
     return {
-      species: sp.id, trait: tr.id,
+      species: sp.id, trait: tr.id, nickname: null,
       createdAt: now, lastInteraction: now,
       lastFed: now, lastPlayed: now, feedCount: 0, nextPoopAt: null,
       lastStageSeen: 'baby',
@@ -632,7 +753,8 @@
     updateCosmetics(state, poopVisible);
     const sp = speciesById(state.species);
     const tr = traitById(state.trait);
-    document.getElementById('label').textContent = sp.name + ' · ' + tr.name;
+    const label = state.nickname ? (state.nickname + ' · ' + sp.name + ' · ' + tr.name) : (sp.name + ' · ' + tr.name);
+    document.getElementById('label').textContent = label;
   }
 
   function showBubble(text){
@@ -671,6 +793,7 @@
       state.lastStageSeen = s;
       saveState(state);
       showBubble(pick(LINES.growth));
+      playSound('growth');
       const c = document.getElementById('creature');
       c.classList.remove('grow-flash'); void c.offsetWidth;
       c.classList.add('grow-flash');
@@ -685,7 +808,15 @@
     state.nextPoopAt = null;
     saveState(state);
     showBubble(pick(LINES.clean));
+    playSound('clean');
+    vibrate(10);
     setTimeout(()=>render(computeMood(state,false)), 320);
+  }
+
+  function idleFlourish(){
+    bounce();
+    showBubble(pick(LINES.idle));
+    playSound('idle');
   }
 
   function interact(kind){
@@ -708,26 +839,39 @@
     if(kind===combo.kind && now-combo.time<1300){ combo.count++; } else { combo.count=1; }
     combo.kind = kind; combo.time = now;
 
-    const isOverload = combo.count>=4;
-    const isJackpot = !isOverload && Math.random()<0.1;
+    // secret sequence: feed -> play -> pet within 6s
+    seqCombo.push({kind, time: now});
+    if(seqCombo.length>3) seqCombo.shift();
+    const isCombo = seqCombo.length===3 &&
+      seqCombo[0].kind==='feed' && seqCombo[1].kind==='play' && seqCombo[2].kind==='pet' &&
+      (seqCombo[2].time - seqCombo[0].time) < 6000;
+    if(isCombo) seqCombo.length = 0;
 
-    let mood, line;
-    if(isOverload){
-      mood = 'dizzy';
-      line = pick(LINES.overload[kind]);
+    const isOverload = !isCombo && combo.count>=4;
+    const isJackpot = !isCombo && !isOverload && Math.random()<0.1;
+
+    let mood, line, soundKind;
+    if(isCombo){
+      mood = 'ecstatic'; line = pick(LINES.combo); soundKind = 'combo';
+    } else if(isOverload){
+      mood = 'dizzy'; line = pick(LINES.overload[kind]); soundKind = 'overload';
     } else if(isJackpot){
-      mood = 'ecstatic';
-      line = pick(LINES.jackpot);
+      mood = 'ecstatic'; line = pick(LINES.jackpot); soundKind = 'jackpot';
     } else {
       mood = state.totalInteractions % 4 === 0 ? 'ecstatic' : 'playful';
-      line = pick(LINES[kind]);
+      line = pick(LINES[kind]); soundKind = kind;
     }
 
     render(mood);
     bounce();
     playEffect(kind);
-    if(isJackpot) playJackpot();
+    if(isJackpot || isCombo) playJackpot();
     showBubble(line);
+    playSound(soundKind);
+    if(isCombo) vibrate([10,30,10,30,10]);
+    else if(isOverload) vibrate([15,30,15,30]);
+    else if(isJackpot) vibrate([10,20,10,20,10]);
+    else vibrate(12);
     clearTimeout(interact._t);
     interact._t = setTimeout(()=>render(computeMood(state,false)), isOverload?2600:2200);
   }
@@ -736,13 +880,69 @@
     if(reunion) return;
     render(computeMood(state,false));
     checkGrowth();
+    if(Math.random()<0.35) idleFlourish();
   }
 
+  /* ---------- header menu ---------- */
+  function openMenu(){
+    if(!state) return;
+    document.getElementById('menuSoundLabel').textContent = 'Звук: ' + (settings.sound ? 'вкл' : 'выкл');
+    document.getElementById('menuOverlay').classList.add('show');
+  }
+  function closeMenu(){
+    document.getElementById('menuOverlay').classList.remove('show');
+  }
+  function renamePet(){
+    closeMenu();
+    const name = window.prompt('Как назовём питомца?', state.nickname || '');
+    if(name===null) return;
+    const trimmed = name.trim().slice(0,18);
+    state.nickname = trimmed || null;
+    saveState(state);
+    render(computeMood(state,false));
+  }
+  function toggleSound(){
+    settings.sound = !settings.sound;
+    saveSettings(settings);
+    document.getElementById('menuSoundLabel').textContent = 'Звук: ' + (settings.sound ? 'вкл' : 'выкл');
+    if(settings.sound) beep(600,0.08,0,'sine',0.08);
+  }
+
+  /* ---------- collection ---------- */
+  function openCollection(){
+    closeMenu();
+    const listEl = document.getElementById('collectionList');
+    let collection = [];
+    try{ collection = JSON.parse(localStorage.getItem(COLLECTION_KEY) || '[]'); }catch(e){}
+    if(!collection.length){
+      listEl.innerHTML = '<div class="collection-empty">Пока никого не отпускал(а).<br>Текущий питомец тоже когда-нибудь тут появится.</div>';
+    } else {
+      const fmt = d => new Date(d).toLocaleDateString('ru-RU', {day:'numeric', month:'short'});
+      listEl.innerHTML = collection.slice().reverse().map(item=>{
+        const sp = speciesById(item.species) || SPECIES[0];
+        const tr = traitById(item.trait) || TRAITS[0];
+        const name = item.nickname ? (item.nickname + ' — ' + sp.name) : sp.name;
+        return '<div class="collection-item">' +
+          '<div class="collection-dot" style="background:linear-gradient(135deg,' + sp.colors[0] + ',' + sp.colors[1] + ')"></div>' +
+          '<div class="collection-info"><div class="collection-name">' + name + ' · ' + tr.name + '</div>' +
+          '<div class="collection-dates">' + fmt(item.hatchedAt) + ' — ' + fmt(item.releasedAt) + '</div></div>' +
+          '</div>';
+      }).join('');
+    }
+    document.getElementById('collectionOverlay').classList.add('show');
+  }
+  function closeCollection(){
+    document.getElementById('collectionOverlay').classList.remove('show');
+  }
+
+  /* ---------- release / change pet ---------- */
   function openResetConfirm(){
+    closeMenu();
     if(!state) return;
     const sp = speciesById(state.species), tr = traitById(state.trait);
+    const name = state.nickname ? ('«' + state.nickname + '» (' + sp.name.toLowerCase() + ')') : ('«' + sp.name + '»');
     document.getElementById('resetText').textContent =
-      'Отпустить «' + sp.name + '» (' + tr.name.toLowerCase() + ') и вылупить нового?';
+      'Отпустить ' + name + ' (' + tr.name.toLowerCase() + ') и вылупить нового?';
     document.getElementById('resetOverlay').classList.add('show');
   }
   function closeResetConfirm(){
@@ -751,7 +951,7 @@
   function releasePet(){
     try{
       const collection = JSON.parse(localStorage.getItem(COLLECTION_KEY) || '[]');
-      collection.push({species: state.species, trait: state.trait, hatchedAt: state.createdAt, releasedAt: Date.now()});
+      collection.push({species: state.species, trait: state.trait, nickname: state.nickname||null, hatchedAt: state.createdAt, releasedAt: Date.now()});
       localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection));
     }catch(e){}
     localStorage.removeItem(STORAGE_KEY);
@@ -759,9 +959,15 @@
   }
 
   function boot(){
-    document.getElementById('header').addEventListener('click', openResetConfirm);
+    document.getElementById('header').addEventListener('click', openMenu);
+    document.getElementById('menuCancel').addEventListener('click', closeMenu);
+    document.getElementById('menuRename').addEventListener('click', renamePet);
+    document.getElementById('menuCollection').addEventListener('click', openCollection);
+    document.getElementById('menuSound').addEventListener('click', toggleSound);
+    document.getElementById('menuRelease').addEventListener('click', openResetConfirm);
     document.getElementById('resetCancel').addEventListener('click', closeResetConfirm);
     document.getElementById('resetConfirmBtn').addEventListener('click', releasePet);
+    document.getElementById('collectionClose').addEventListener('click', closeCollection);
 
     const isNew = !state;
     if(isNew){
@@ -777,6 +983,7 @@
           applyPalette(speciesById(state.species));
           buildHatchPreview();
           reveal.classList.add('show');
+          playSound('hatch');
           const sp = speciesById(state.species), tr = traitById(state.trait);
           document.getElementById('hatchName').textContent = 'Это ' + tr.name.toLowerCase() + ' по имени «' + sp.name + '»';
         }, 1500);
@@ -787,6 +994,7 @@
     if(!state.lastFed) state.lastFed = state.createdAt;
     if(!state.lastPlayed) state.lastPlayed = state.createdAt;
     if(!state.lastStageSeen) state.lastStageSeen = stageOf(state);
+    if(state.nickname===undefined) state.nickname = null;
     const wasGone = (Date.now()-state.lastInteraction)/3600000 > 20;
     const today = todayStr();
     if(state.lastOpenDate !== today){
