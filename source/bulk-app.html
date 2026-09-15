@@ -292,11 +292,12 @@
     width:min(90vw,320px); margin-top:2px; z-index:1;
   }
   #bubble{
-    background:white; color:#2c3a36; padding:14px 20px; border-radius:20px;
+    background:white; color:#2c3a36; padding:13px 20px; border-radius:20px;
     font-size:14px; font-weight:600; max-width:280px; text-align:center; line-height:1.35;
     box-shadow:0 10px 22px rgba(0,0,0,0.10);
+    border:2.5px solid var(--body2);
     opacity:0; transform:translateY(-6px) scale(0.95);
-    transition:opacity 0.25s, transform 0.25s;
+    transition:opacity 0.25s, transform 0.25s, border-color 0.4s;
   }
   #bubble.show{opacity:1; transform:translateY(0) scale(1);}
 
