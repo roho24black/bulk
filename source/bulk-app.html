@@ -196,8 +196,11 @@
   .creature.species-star .body-star{display:block;}
   .creature.species-rainbow .body-rainbow{display:block; fill:url(#rainbowGrad); stroke:white; stroke-width:1.5; stroke-opacity:0.5; animation:hueShift 4s linear infinite;}
   @keyframes hueShift{to{filter:hue-rotate(360deg);}}
-  .gloss{fill:white; opacity:0.35;}
-  .creature.species-crystal .gloss, .creature.species-rainbow .gloss{display:none;}
+  .gloss{fill:white; opacity:0.4;}
+  .gloss-dot{fill:white; opacity:0.55;}
+  .body-shadow{fill:#000; opacity:0.12;}
+  .creature.species-crystal .gloss, .creature.species-rainbow .gloss,
+  .creature.species-crystal .gloss-dot, .creature.species-rainbow .gloss-dot{display:none;}
 
   .deco{display:none;}
   .creature.species-blot .deco-blot{display:block;}
