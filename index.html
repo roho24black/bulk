@@ -49,6 +49,21 @@
   }
   #header:active{opacity:0.7;}
 
+  #rosterStrip{
+    position:fixed; top:calc(48px + env(safe-area-inset-top)); left:0; right:0;
+    display:none; justify-content:center; align-items:center; gap:9px; z-index:4; padding:0 16px;
+  }
+  .roster-dot{
+    width:30px; height:30px; border-radius:50%; border:2px solid transparent; padding:0;
+    cursor:pointer; flex-shrink:0; box-shadow:0 2px 6px rgba(0,0,0,0.15); transition:transform 0.15s;
+  }
+  .roster-dot.active{border-color:var(--ink); transform:scale(1.15);}
+  .roster-add{
+    width:28px; height:28px; border-radius:50%; border:2px dashed rgba(0,0,0,0.3); background:none;
+    display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700;
+    color:var(--ink); opacity:0.5; cursor:pointer; flex-shrink:0;
+  }
+
   /* ---------- HATCH SCREEN ---------- */
   #hatch{
     position:fixed; inset:0; display:flex; flex-direction:column; align-items:center;
@@ -134,7 +149,7 @@
   .collection-empty{text-align:center; opacity:0.5; padding:30px 10px; font-size:14px; line-height:1.5;}
 
   /* ---------- MAIN SCREEN ---------- */
-  #stage{position:relative; width:min(90vw,320px); height:280px; display:flex; align-items:center; justify-content:center;}
+  #stage{position:relative; width:min(90vw,320px); height:280px; display:flex; align-items:center; justify-content:center; z-index:1;}
   .creature{width:100%; height:100%; overflow:visible;}
 
   .aura{fill:var(--body2); opacity:0; filter:blur(18px);}
@@ -142,6 +157,10 @@
   @keyframes auraPulse{0%,100%{opacity:0.3; r:90px;}50%{opacity:0.5; r:98px;}}
 
   .ground-shadow{fill:#000; opacity:0.09;}
+
+  .ambient-twinkle polygon{animation:twinkle 2.6s ease-in-out infinite; transform-box:fill-box; transform-origin:center;}
+  .ambient-twinkle polygon:nth-child(2){animation-delay:1.1s;}
+  @keyframes twinkle{0%,100%{opacity:0.12; transform:scale(0.65);}50%{opacity:0.6; transform:scale(1);}}
 
   /* growth stage scaling, kept separate from mood/bounce animation transforms */
   #stageScale{transform-origin:100px 118px; transition:transform 0.6s ease;}
@@ -151,14 +170,19 @@
   .creature.grow-flash #stageScale{animation:growFlash 0.9s ease;}
   @keyframes growFlash{0%{filter:brightness(1) saturate(1);}40%{filter:brightness(1.35) saturate(1.4);}100%{filter:brightness(1) saturate(1);}}
 
-  .body-shape{display:none; fill:url(#bodyGrad);}
+  .body-shape{display:none; fill:url(#bodyGrad); stroke:var(--ink); stroke-width:3; stroke-opacity:0.18; stroke-linejoin:round;}
   .creature.species-drop .body-drop{display:block;}
   .creature.species-spike .body-spike{display:block;}
   .creature.species-cloud .body-cloud{display:block;}
+  .creature.species-leaf .body-leaf{display:block;}
+  .creature.species-flame .body-flame{display:block;}
   .creature.species-crystal .body-crystal{display:block; stroke:white; stroke-width:1.5; stroke-opacity:0.5;}
   .creature.species-blot .body-blot{display:block;}
+  .creature.species-star .body-star{display:block;}
+  .creature.species-rainbow .body-rainbow{display:block; fill:url(#rainbowGrad); stroke:white; stroke-width:1.5; stroke-opacity:0.5; animation:hueShift 4s linear infinite;}
+  @keyframes hueShift{to{filter:hue-rotate(360deg);}}
   .gloss{fill:white; opacity:0.35;}
-  .creature.species-crystal .gloss{display:none;}
+  .creature.species-crystal .gloss, .creature.species-rainbow .gloss{display:none;}
 
   .deco{display:none;}
   .creature.species-blot .deco-blot{display:block;}
@@ -246,7 +270,7 @@
   /* speech bubble */
   #bubbleWrap{
     min-height:70px; display:flex; align-items:flex-start; justify-content:center;
-    width:min(90vw,320px); margin-top:2px;
+    width:min(90vw,320px); margin-top:2px; z-index:1;
   }
   #bubble{
     background:white; color:var(--ink); padding:14px 20px; border-radius:20px;
@@ -257,10 +281,10 @@
   }
   #bubble.show{opacity:1; transform:translateY(0) scale(1);}
 
-  #label{margin-top:2px; font-size:13px; opacity:0.5; font-weight:600; letter-spacing:0.02em;}
+  #label{margin-top:2px; font-size:13px; opacity:0.5; font-weight:600; letter-spacing:0.02em; z-index:1;}
 
   #buttons{
-    position:fixed; left:0; right:0; bottom:0;
+    position:fixed; left:0; right:0; bottom:0; z-index:5;
     padding:0 24px calc(20px + env(safe-area-inset-bottom)) 24px;
     display:flex; justify-content:center; gap:22px;
   }
@@ -278,7 +302,10 @@
 </head>
 <body>
 
+<div id="ambient"><span></span><span></span><span></span><span></span><span></span></div>
+
 <button id="header" type="button">БУЛЬК</button>
+<div id="rosterStrip"></div>
 
 <div id="hatch">
   <div id="eggWrap">
@@ -335,10 +362,21 @@
           <stop offset="0%" stop-color="var(--body1)"/>
           <stop offset="100%" stop-color="var(--body2)"/>
         </radialGradient>
+        <linearGradient id="rainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff8fa3"/>
+          <stop offset="25%" stop-color="#ffd15c"/>
+          <stop offset="50%" stop-color="#8fe8cf"/>
+          <stop offset="75%" stop-color="#5cb3ff"/>
+          <stop offset="100%" stop-color="#b89aff"/>
+        </linearGradient>
       </defs>
 
       <circle class="aura" cx="100" cy="118" r="90"/>
       <ellipse class="ground-shadow" cx="100" cy="205" rx="56" ry="9"/>
+      <g class="ambient-twinkle">
+        <polygon points="30,50 33,58 41,60 33,62 30,70 27,62 19,60 27,58" fill="var(--body2)" opacity="0.5"/>
+        <polygon points="172,140 174,146 180,148 174,150 172,156 170,150 164,148 170,146" fill="var(--body2)" opacity="0.4"/>
+      </g>
 
       <g id="stageScale">
         <g id="bodyGroup">
@@ -353,8 +391,12 @@
             <circle cx="83" cy="87" r="29"/>
             <circle cx="117" cy="87" r="29"/>
           </g>
+          <path class="body-shape body-leaf" d="M100,38 C138,58 148,108 120,158 C108,180 92,180 80,158 C52,108 62,58 100,38 Z"/>
+          <path class="body-shape body-flame" d="M100,30 C138,68 150,113 128,153 C112,181 88,181 72,153 C50,113 62,68 100,30 Z"/>
           <polygon class="body-shape body-crystal" points="100,30 152,74 140,157 100,194 60,157 48,74"/>
           <path class="body-shape body-blot" d="M100,35 C130,32 158,55 165,90 C172,128 158,168 122,182 C90,194 55,182 40,150 C25,118 32,78 60,55 C75,43 85,37 100,35 Z"/>
+          <polygon class="body-shape body-star" points="100,36 119,92 178,93 130,128 148,184 100,150 52,184 70,128 22,93 81,92"/>
+          <polygon class="body-shape body-rainbow" points="100,30 152,74 140,157 100,194 60,157 48,74"/>
 
           <ellipse class="gloss" cx="72" cy="74" rx="20" ry="14"/>
 
@@ -513,16 +555,23 @@
 
 <script>
 (function(){
-  const STORAGE_KEY = 'bulk_state_v1';
+  const ROSTER_KEY = 'bulk_roster_v1';
+  const ACTIVE_KEY = 'bulk_active_id_v1';
+  const OLD_SINGLE_KEY = 'bulk_state_v1';
   const COLLECTION_KEY = 'bulk_collection_v1';
   const SETTINGS_KEY = 'bulk_settings_v1';
+  const MAX_ROSTER = 6;
 
   const SPECIES = [
-    {id:'drop',    name:'Капля',    weight:32, colors:['#8fe8cf','#3fc9a4'], bg:['#eafaf6','#d6f5ec']},
-    {id:'spike',   name:'Шип',      weight:24, colors:['#ffc79a','#ff8a4c'], bg:['#fff3ea','#ffe3cf']},
-    {id:'cloud',   name:'Облачко',  weight:22, colors:['#e2d4ff','#b89aff'], bg:['#f5f0ff','#ece1ff']},
-    {id:'crystal', name:'Кристалл', weight:14, colors:['#a9dcff','#5cb3ff'], bg:['#eaf6ff','#d9edff']},
-    {id:'blot',    name:'Пятно',    weight:8,  colors:['#8f7ab8','#4a3d63'], bg:['#2b2438','#1c1726'], dark:true},
+    {id:'drop',    name:'Капля',    weight:26, colors:['#8fe8cf','#3fc9a4'], bg:['#eafaf6','#d6f5ec']},
+    {id:'spike',   name:'Шип',      weight:18, colors:['#ffc79a','#ff8a4c'], bg:['#fff3ea','#ffe3cf']},
+    {id:'cloud',   name:'Облачко',  weight:16, colors:['#e2d4ff','#b89aff'], bg:['#f5f0ff','#ece1ff']},
+    {id:'leaf',    name:'Листик',   weight:15, colors:['#c3e88a','#7cb955'], bg:['#f1f9e8','#e3f3d2']},
+    {id:'crystal', name:'Кристалл', weight:10, colors:['#a9dcff','#5cb3ff'], bg:['#eaf6ff','#d9edff']},
+    {id:'flame',   name:'Огонёк',   weight:9,  colors:['#ffb199','#ff6a4d'], bg:['#fff0ec','#ffe1d8']},
+    {id:'blot',    name:'Пятно',    weight:5,  colors:['#8f7ab8','#4a3d63'], bg:['#2b2438','#1c1726'], dark:true, rare:true},
+    {id:'star',    name:'Звезда',   weight:4,  colors:['#ffe08a','#ffb020'], bg:['#fffaf0','#fff0d6'], rare:true},
+    {id:'rainbow', name:'Радуга',   weight:2,  colors:['#ffd15c','#b89aff'], bg:['#fff7f0','#f3ecff'], rare:true},
   ];
 
   const TRAITS = [
@@ -536,96 +585,104 @@
 
   const LINES = {
     feed: [
-      "Ммм, спасибо. Хотя я не уверен, что у меня есть желудок.",
-      "Вкусно! А ещё есть?",
-      "Это было неожиданно. Приятно, но неожиданно.",
-      "Я его понюхал, покатал и теперь я счастлив.",
-      "Кто-то принёс мне еду. Не спрашивай, откуда я знаю слово 'еда'."
+      "Ням! Ещё?",
+      "Вот это вкусно.",
+      "Как раз вовремя.",
+      "М-м-м, огонь.",
+      "Спасибо, шеф!",
+      "Обожаю этот момент.",
+      "Заправился на все сто.",
+      "Вот это забота!"
     ],
     play: [
-      "Опять эти прыжки. Мне нравится.",
-      "Я делаю вид, что устал, но продолжай.",
-      "Это была лучшая секунда моего дня.",
-      "Ура! Хотя я не совсем понимаю, что произошло.",
-      "Давай ещё раз, только медленнее в этот раз."
+      "Ура, наконец-то!",
+      "Ещё, ещё!",
+      "Вот это движуха!",
+      "Мой любимый момент.",
+      "Дайте два!",
+      "Я в игре!",
+      "Заряжен на весь день.",
+      "Вот это я понимаю."
     ],
     pet: [
-      "Погладь меня, я устал существовать.",
-      "О, приятно. Продолжай, пожалуйста.",
-      "Я растекаюсь от удовольствия. Буквально.",
-      "Это лучшее, что случилось со мной за сегодня.",
-      "Мурчал бы, если бы умел."
+      "М-м, приятно.",
+      "Ещё чуть-чуть.",
+      "Обожаю, когда так.",
+      "Тепло и хорошо.",
+      "Лучший момент дня.",
+      "Мур... почти.",
+      "Вот это забота.",
+      "Мне это нравится."
     ],
     reunion: [
-      "О! Ты вернулся. Я как раз ничего не делал.",
-      "Я думал о смысле жизни, пока тебя не было. Выводов нет.",
-      "Наконец-то. У меня накопилось столько нечего рассказать.",
-      "Ты вернулся! Притворюсь, что не скучал."
+      "Ты вернулся! Ура!",
+      "Наконец-то!",
+      "Я скучал, если что.",
+      "С возвращением!"
     ],
     gloomy: [
-      "Кто-то принёс мне шляпу. Не спрашивай откуда.",
-      "Я тут медитировал. Или просто застыл. Сложно сказать.",
-      "Время — иллюзия, особенно когда тебя нет рядом.",
-      "Я начал разговаривать сам с собой. Мы не согласны друг с другом."
+      "Мне грустно без тебя.",
+      "Я совсем заскучал.",
+      "Долго тебя не было.",
+      "Вернись поскорее, ладно?"
     ],
     hungry: [
-      "Мой живот делает грустные звуки.",
-      "Кажется, самое время поесть.",
-      "Я бы не отказался от чего-нибудь съедобного.",
-      "Пустой внутри. И это не метафора."
+      "Я хочу есть.",
+      "Живот урчит.",
+      "Покорми меня, а?",
+      "Голоден как никогда."
     ],
     bored: [
-      "Мне скучно. Придумай что-нибудь.",
-      "Каждая секунда без игры тянется вечность.",
-      "Я посчитал трещины на потолке. Их 47.",
-      "Развлеки меня, пожалуйста. Хоть чем-нибудь."
+      "Мне скучно!",
+      "Поиграй со мной.",
+      "Скукота полная.",
+      "Развлеки меня!"
     ],
     clean: [
-      "Ой. Неловко. Спасибо.",
-      "Ты не обязан был это делать, но спасибо.",
-      "Считай, что этого не было.",
-      "Это была случайность. Наверное."
+      "Ой. Спасибо!",
+      "Неловко вышло.",
+      "Ты лучший.",
+      "Чистота — красота."
     ],
     growth: [
-      "Кажется, я подрос!",
-      "Что-то во мне изменилось. Приятно.",
-      "Я теперь чуточку больше вчерашнего себя."
+      "Я подрос!",
+      "Смотри, я больше!",
+      "Расту на глазах."
     ],
     idle: [
-      "Просто существую. Как обычно.",
-      "У меня было видение. Забыл, о чём.",
-      "Иногда я просто вибрирую. Без причины.",
-      "Если долго смотреть на меня, я начинаю нервничать.",
-      "Придумал шутку. Забыл шутку.",
-      "Который час? Неважно, у меня нет часов."
+      "Жду тебя.",
+      "Скучаю потихоньку.",
+      "Что делаем дальше?",
+      "Тук-тук, я тут.",
+      "Соскучился уже."
     ],
     jackpot: [
-      "ЭТО БЫЛ ЛУЧШИЙ МОМЕНТ МОЕЙ ЖИЗНИ.",
-      "Кажется, я только что телепортировался от радости.",
-      "Всё вокруг стало ярче. Это нормально?",
-      "У меня внутри салют. Настоящий."
+      "ДЖЕКПОТ! Лучший момент!",
+      "Вот это удача!",
+      "Это было невероятно!",
+      "У меня внутри салют!"
     ],
     combo: [
-      "ИДЕАЛЬНЫЙ УХОД! Ты знаешь секрет.",
-      "Погладил, покормил, поиграл — ты профи.",
-      "Это было по науке. Мне нравится.",
-      "Комбо! Если бы тут были очки, я бы их насчитал."
+      "ИДЕАЛЬНЫЙ УХОД! Комбо!",
+      "Еда, игра, ласка — идеально!",
+      "Ты знаешь секрет!",
+      "Вот это план ухода!"
     ],
     overload: {
       feed: [
-        "Я СЕЙЧАС ЛОПНУ.",
-        "Так, стоп, я наелся на неделю вперёд.",
-        "Ещё одна конфета и я взорвусь. В хорошем смысле?"
+        "Я сейчас лопну!",
+        "Хватит, я наелся!",
+        "Ещё одна — и всё!"
       ],
       play: [
-        "У меня кружится голова!!",
-        "Притормози, чемпион.",
-        "Я больше не чувствую ног. У меня их и не было."
+        "Голова кружится!",
+        "Притормози!",
+        "Не чувствую ног!"
       ],
       pet: [
-        "Ладно-ладно, я понял, ты меня любишь!",
-        "Ещё одно поглаживание и я растаю в лужу.",
-        "Хватит! ...шучу, не хватит, продолжай."
+        "Понял, ты меня любишь!",
+        "Я сейчас растаю!",
+        "Хватит... не хватит!"
       ]
     }
   };
@@ -640,11 +697,13 @@
   }
 
   function todayStr(){ return new Date().toISOString().slice(0,10); }
+  function makeId(){ return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
-  function loadState(){
-    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){ return null; }
+  function loadRoster(){
+    try{ return JSON.parse(localStorage.getItem(ROSTER_KEY)) || []; }catch(e){ return []; }
   }
-  function saveState(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+  function saveRoster(){ localStorage.setItem(ROSTER_KEY, JSON.stringify(roster)); }
+  function saveActiveId(){ if(activeId) localStorage.setItem(ACTIVE_KEY, activeId); }
 
   function loadSettings(){
     try{ return Object.assign({sound:true}, JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')); }
@@ -652,12 +711,31 @@
   }
   function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
 
-  function speciesById(id){ return SPECIES.find(s=>s.id===id); }
-  function traitById(id){ return TRAITS.find(t=>t.id===id); }
+  function speciesById(id){ return SPECIES.find(s=>s.id===id) || SPECIES[0]; }
+  function traitById(id){ return TRAITS.find(t=>t.id===id) || TRAITS[0]; }
 
-  let state = loadState();
+  function migrateOldSingle(list){
+    try{
+      const old = localStorage.getItem(OLD_SINGLE_KEY);
+      if(old){
+        const p = JSON.parse(old);
+        p.id = makeId();
+        if(p.nickname===undefined) p.nickname = null;
+        list.push(p);
+        localStorage.removeItem(OLD_SINGLE_KEY);
+      }
+    }catch(e){}
+  }
+
+  let roster = loadRoster();
+  if(!roster.length) migrateOldSingle(roster);
+  let activeId = localStorage.getItem(ACTIVE_KEY);
+  if(!roster.find(p=>p.id===activeId)) activeId = roster.length ? roster[0].id : null;
+  let state = roster.find(p=>p.id===activeId) || null;
   let settings = loadSettings();
   let reunion = false;
+  let cracking = false;
+  let tickStarted = false;
   const combo = {kind:null, count:0, time:0};
   const seqCombo = [];
 
@@ -710,6 +788,7 @@
     const tr = pick(TRAITS);
     const now = Date.now();
     return {
+      id: makeId(),
       species: sp.id, trait: tr.id, nickname: null,
       createdAt: now, lastInteraction: now,
       lastFed: now, lastPlayed: now, feedCount: 0, nextPoopAt: null,
@@ -815,7 +894,7 @@
     const s = stageOf(state);
     if(s !== state.lastStageSeen){
       state.lastStageSeen = s;
-      saveState(state);
+      saveRoster();
       showBubble(pick(LINES.growth));
       playSound('growth');
       const c = document.getElementById('creature');
@@ -826,11 +905,11 @@
   }
 
   function cleanPoop(){
-    if(!state.nextPoopAt) return;
+    if(!state || !state.nextPoopAt) return;
     const inner = document.querySelector('.poop-inner');
     if(inner) inner.classList.add('cleaning');
     state.nextPoopAt = null;
-    saveState(state);
+    saveRoster();
     showBubble(pick(LINES.clean));
     playSound('clean');
     vibrate(10);
@@ -844,6 +923,7 @@
   }
 
   function interact(kind){
+    if(!state) return;
     const now = Date.now();
     state.totalInteractions++;
     state.lastInteraction = now;
@@ -857,7 +937,7 @@
     if(kind==='play') state.lastPlayed = now;
     if(state.totalInteractions>=30) state.auraUnlocked = true;
     if(state.streakDays>=5) state.accessoryUnlocked = true;
-    saveState(state);
+    saveRoster();
 
     // rapid-tap tracking (session-only) — spam the same button and the pet notices
     if(kind===combo.kind && now-combo.time<1300){ combo.count++; } else { combo.count=1; }
@@ -901,7 +981,7 @@
   }
 
   function tick(){
-    if(reunion) return;
+    if(reunion || !state) return;
     render(computeMood(state,false));
     checkGrowth();
     if(Math.random()<0.35) idleFlourish();
@@ -922,8 +1002,9 @@
     if(name===null) return;
     const trimmed = name.trim().slice(0,18);
     state.nickname = trimmed || null;
-    saveState(state);
+    saveRoster();
     render(computeMood(state,false));
+    renderRosterStrip();
   }
   function toggleSound(){
     settings.sound = !settings.sound;
@@ -939,15 +1020,16 @@
     let collection = [];
     try{ collection = JSON.parse(localStorage.getItem(COLLECTION_KEY) || '[]'); }catch(e){}
     if(!collection.length){
-      listEl.innerHTML = '<div class="collection-empty">Пока никого не отпускал(а).<br>Текущий питомец тоже когда-нибудь тут появится.</div>';
+      listEl.innerHTML = '<div class="collection-empty">Пока никого не отпускал(а).<br>Текущие питомцы тоже когда-нибудь тут появятся.</div>';
     } else {
       const fmt = d => new Date(d).toLocaleDateString('ru-RU', {day:'numeric', month:'short'});
       listEl.innerHTML = collection.slice().reverse().map(item=>{
-        const sp = speciesById(item.species) || SPECIES[0];
-        const tr = traitById(item.trait) || TRAITS[0];
+        const sp = speciesById(item.species);
+        const tr = traitById(item.trait);
         const name = item.nickname ? (item.nickname + ' — ' + sp.name) : sp.name;
+        const grad = sp.id==='rainbow' ? 'linear-gradient(135deg,#ff8fa3,#ffd15c,#8fe8cf,#5cb3ff,#b89aff)' : ('linear-gradient(135deg,'+sp.colors[0]+','+sp.colors[1]+')');
         return '<div class="collection-item">' +
-          '<div class="collection-dot" style="background:linear-gradient(135deg,' + sp.colors[0] + ',' + sp.colors[1] + ')"></div>' +
+          '<div class="collection-dot" style="background:' + grad + '"></div>' +
           '<div class="collection-info"><div class="collection-name">' + name + ' · ' + tr.name + '</div>' +
           '<div class="collection-dates">' + fmt(item.hatchedAt) + ' — ' + fmt(item.releasedAt) + '</div></div>' +
           '</div>';
@@ -957,6 +1039,47 @@
   }
   function closeCollection(){
     document.getElementById('collectionOverlay').classList.remove('show');
+  }
+
+  /* ---------- roster strip (multiple pets at once) ---------- */
+  function renderRosterStrip(){
+    const el = document.getElementById('rosterStrip');
+    if(!roster.length){ el.innerHTML=''; el.style.display='none'; return; }
+    el.style.display = 'flex';
+    let html = roster.map(p=>{
+      const sp = speciesById(p.species);
+      const grad = sp.id==='rainbow' ? 'linear-gradient(135deg,#ff8fa3,#ffd15c,#8fe8cf,#5cb3ff,#b89aff)' : ('linear-gradient(135deg,'+sp.colors[0]+','+sp.colors[1]+')');
+      const activeCls = p.id===activeId ? ' active' : '';
+      return '<button class="roster-dot' + activeCls + '" style="background:' + grad + '" data-id="' + p.id + '" title="' + (p.nickname||sp.name) + '"></button>';
+    }).join('');
+    if(roster.length < MAX_ROSTER) html += '<button class="roster-add" id="rosterAddBtn" type="button">+</button>';
+    el.innerHTML = html;
+    el.querySelectorAll('.roster-dot').forEach(btn=>{
+      btn.addEventListener('click', ()=>switchActive(btn.getAttribute('data-id')));
+    });
+    const addBtn = document.getElementById('rosterAddBtn');
+    if(addBtn) addBtn.addEventListener('click', requestNewPet);
+  }
+
+  function switchActive(id){
+    if(id===activeId) return;
+    const next = roster.find(p=>p.id===id);
+    if(!next) return;
+    activeId = id;
+    saveActiveId();
+    state = next;
+    applyPalette(speciesById(state.species));
+    reunion = false;
+    render(computeMood(state,false));
+    renderRosterStrip();
+  }
+
+  function requestNewPet(){
+    if(roster.length>=MAX_ROSTER){
+      window.alert('Максимум ' + MAX_ROSTER + ' питомцев одновременно. Сначала отпусти кого-нибудь.');
+      return;
+    }
+    openHatch();
   }
 
   /* ---------- release / change pet ---------- */
@@ -978,58 +1101,44 @@
       collection.push({species: state.species, trait: state.trait, nickname: state.nickname||null, hatchedAt: state.createdAt, releasedAt: Date.now()});
       localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection));
     }catch(e){}
-    localStorage.removeItem(STORAGE_KEY);
+    const idx = roster.findIndex(p=>p.id===activeId);
+    if(idx>-1) roster.splice(idx,1);
+    saveRoster();
+    localStorage.removeItem(ACTIVE_KEY);
     location.reload();
   }
 
-  function boot(){
-    document.getElementById('header').addEventListener('click', openMenu);
-    document.getElementById('menuCancel').addEventListener('click', closeMenu);
-    document.getElementById('menuRename').addEventListener('click', renamePet);
-    document.getElementById('menuCollection').addEventListener('click', openCollection);
-    document.getElementById('menuSound').addEventListener('click', toggleSound);
-    document.getElementById('menuRelease').addEventListener('click', openResetConfirm);
-    document.getElementById('resetCancel').addEventListener('click', closeResetConfirm);
-    document.getElementById('resetConfirmBtn').addEventListener('click', releasePet);
-    document.getElementById('collectionClose').addEventListener('click', closeCollection);
+  /* ---------- hatch flow (works both first-time and for "+" additions) ---------- */
+  function openHatch(){
+    document.getElementById('hatch').classList.remove('hidden');
+    document.getElementById('eggWrap').style.display = '';
+    document.getElementById('egg').classList.remove('cracking');
+    document.getElementById('hatchReveal').classList.remove('show');
+    document.getElementById('hatchCreatureWrap').innerHTML = '';
+    cracking = false;
+  }
 
-    const isNew = !state;
-    if(isNew){
-      document.getElementById('hatch').classList.remove('hidden');
-      document.getElementById('egg').addEventListener('click', function onCrack(){
-        document.getElementById('egg').classList.add('cracking');
-        this.removeEventListener('click', onCrack);
-        setTimeout(()=>{
-          state = createNewPet();
-          saveState(state);
-          document.getElementById('eggWrap').style.display = 'none';
-          const reveal = document.getElementById('hatchReveal');
-          applyPalette(speciesById(state.species));
-          buildHatchPreview();
-          reveal.classList.add('show');
-          playSound('hatch');
-          const sp = speciesById(state.species), tr = traitById(state.trait);
-          document.getElementById('hatchName').textContent = 'Это ' + tr.name.toLowerCase() + ' по имени «' + sp.name + '»';
-        }, 1500);
-      });
-      document.getElementById('hatchBtn').addEventListener('click', function(){ startApp(false); });
-      return;
-    }
-    if(!state.lastFed) state.lastFed = state.createdAt;
-    if(!state.lastPlayed) state.lastPlayed = state.createdAt;
-    if(!state.lastStageSeen) state.lastStageSeen = stageOf(state);
-    if(state.nickname===undefined) state.nickname = null;
-    const wasGone = (Date.now()-state.lastInteraction)/3600000 > 20;
-    const today = todayStr();
-    if(state.lastOpenDate !== today){
-      const yest = new Date(Date.now()-86400000).toISOString().slice(0,10);
-      state.streakDays = (state.lastOpenDate===yest) ? state.streakDays+1 : 1;
-      state.lastOpenDate = today;
-    }
-    if(wasGone) state.neglectCount++;
-    if(state.neglectCount>=2) state.scarUnlocked = true;
-    saveState(state);
-    startApp(wasGone);
+  function crackEgg(){
+    if(cracking) return;
+    cracking = true;
+    document.getElementById('egg').classList.add('cracking');
+    setTimeout(()=>{
+      const pet = createNewPet();
+      roster.push(pet);
+      state = pet;
+      activeId = pet.id;
+      saveRoster();
+      saveActiveId();
+      document.getElementById('eggWrap').style.display = 'none';
+      applyPalette(speciesById(pet.species));
+      buildHatchPreview();
+      document.getElementById('hatchReveal').classList.add('show');
+      playSound('hatch');
+      const sp = speciesById(pet.species), tr = traitById(pet.trait);
+      document.getElementById('hatchName').textContent =
+        'Это ' + tr.name.toLowerCase() + ' по имени «' + sp.name + '»' + (sp.rare ? ' ✨ Редкий вид!' : '');
+      cracking = false;
+    }, 1500);
   }
 
   function buildHatchPreview(){
@@ -1043,20 +1152,60 @@
     wrap.appendChild(clone);
   }
 
-  function startApp(wasGone){
+  function showMain(wasGone){
     document.getElementById('hatch').classList.add('hidden');
     applyPalette(speciesById(state.species));
     reunion = !!wasGone;
     render(reunion ? 'ecstatic' : computeMood(state,false));
     if(reunion) showBubble(pick(LINES.reunion));
     setTimeout(()=>{ reunion=false; render(computeMood(state,false)); checkGrowth(); }, reunion?3200:0);
+    if(!tickStarted){ setInterval(tick, 60000); tickStarted = true; }
+  }
 
+  function bindListeners(){
+    document.getElementById('header').addEventListener('click', openMenu);
+    document.getElementById('menuCancel').addEventListener('click', closeMenu);
+    document.getElementById('menuRename').addEventListener('click', renamePet);
+    document.getElementById('menuCollection').addEventListener('click', openCollection);
+    document.getElementById('menuSound').addEventListener('click', toggleSound);
+    document.getElementById('menuRelease').addEventListener('click', openResetConfirm);
+    document.getElementById('resetCancel').addEventListener('click', closeResetConfirm);
+    document.getElementById('resetConfirmBtn').addEventListener('click', releasePet);
+    document.getElementById('collectionClose').addEventListener('click', closeCollection);
+    document.getElementById('egg').addEventListener('click', crackEgg);
+    document.getElementById('hatchBtn').addEventListener('click', function(){ showMain(false); renderRosterStrip(); });
     document.getElementById('btnFeed').addEventListener('click', ()=>interact('feed'));
     document.getElementById('btnPlay').addEventListener('click', ()=>interact('play'));
     document.getElementById('btnPet').addEventListener('click', ()=>interact('pet'));
     document.querySelector('.poop').addEventListener('click', cleanPoop);
+  }
 
-    setInterval(tick, 60000);
+  function boot(){
+    bindListeners();
+
+    if(!roster.length){
+      openHatch();
+      return;
+    }
+
+    if(!state.lastFed) state.lastFed = state.createdAt;
+    if(!state.lastPlayed) state.lastPlayed = state.createdAt;
+    if(!state.lastStageSeen) state.lastStageSeen = stageOf(state);
+    if(state.nickname===undefined) state.nickname = null;
+
+    const wasGone = (Date.now()-state.lastInteraction)/3600000 > 20;
+    const today = todayStr();
+    if(state.lastOpenDate !== today){
+      const yest = new Date(Date.now()-86400000).toISOString().slice(0,10);
+      state.streakDays = (state.lastOpenDate===yest) ? state.streakDays+1 : 1;
+      state.lastOpenDate = today;
+    }
+    if(wasGone) state.neglectCount++;
+    if(state.neglectCount>=2) state.scarUnlocked = true;
+    saveActiveId();
+    saveRoster();
+    showMain(wasGone);
+    renderRosterStrip();
   }
 
   boot();
