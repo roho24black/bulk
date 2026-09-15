@@ -167,8 +167,8 @@
   #stage{position:relative; width:min(90vw,320px); height:280px; display:flex; align-items:center; justify-content:center; z-index:1;}
   .creature{width:100%; height:100%; overflow:visible;}
 
-  .aura{fill:var(--body2); opacity:0; filter:blur(18px);}
-  .creature.has-aura .aura{opacity:0.4; animation:auraPulse 3s ease-in-out infinite;}
+  .aura{fill:var(--body2); opacity:0.2; filter:blur(20px);}
+  .creature.has-aura .aura{opacity:0.45; animation:auraPulse 3s ease-in-out infinite;}
   @keyframes auraPulse{0%,100%{opacity:0.3; r:90px;}50%{opacity:0.5; r:98px;}}
 
   .ground-shadow{fill:#000; opacity:0.09;}
@@ -317,7 +317,8 @@
 </head>
 <body>
 
-<div id="ambient"><span></span><span></span><span></span><span></span><span></span></div>
+<div id="ambient"><span></span><span></span><span></span><span></span><span></span><div class="cloud c1"></div><div class="cloud c2"></div></div>
+<div id="ground"></div>
 
 <button id="header" type="button">БУЛЬК</button>
 <div id="rosterStrip"></div>
