@@ -28,10 +28,10 @@
     padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom);
   }
 
-  /* ambient background life — soft drifting blobs so the scene never sits dead still */
+  /* ambient background life — soft drifting blobs + clouds so the scene never sits dead still */
   #ambient{position:fixed; inset:0; overflow:hidden; z-index:0; pointer-events:none;}
   #ambient span{
-    position:absolute; border-radius:50%; background:var(--body2); opacity:0.14; filter:blur(2px);
+    position:absolute; border-radius:50%; background:var(--body2); opacity:0.16; filter:blur(2px);
     animation:drift 14s ease-in-out infinite;
   }
   #ambient span:nth-child(1){width:90px; height:90px; left:8%; top:14%; animation-duration:16s;}
@@ -40,6 +40,21 @@
   #ambient span:nth-child(4){width:40px; height:40px; right:16%; bottom:28%; animation-duration:11s; animation-delay:-5s;}
   #ambient span:nth-child(5){width:110px; height:110px; right:-30px; top:50%; animation-duration:20s; animation-delay:-9s;}
   @keyframes drift{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(14px,-18px) scale(1.12);}}
+
+  #ambient .cloud{
+    position:absolute; border-radius:50%; background:white; opacity:0.5; filter:blur(1px);
+    animation:cloudDrift 30s linear infinite;
+  }
+  #ambient .cloud.c1{width:80px; height:26px; top:9%; left:-100px; animation-duration:26s;}
+  #ambient .cloud.c2{width:56px; height:20px; top:16%; left:-100px; animation-duration:34s; animation-delay:-14s; opacity:0.35;}
+  @keyframes cloudDrift{from{transform:translateX(0);}to{transform:translateX(calc(100vw + 160px));}}
+
+  #ground{
+    position:fixed; left:-10%; right:-10%; bottom:0; height:34vh; z-index:0; pointer-events:none;
+    background:var(--body2); opacity:0.16;
+    border-radius:50% 50% 0 0 / 70px 70px 0 0;
+    transition:background 0.8s ease;
+  }
 
   #header{
     position:fixed; top:calc(16px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%);
