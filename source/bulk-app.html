@@ -855,6 +855,7 @@
     else if(kind==='jackpot'){ [523,659,784,1046].forEach((f,i)=>beep(f,0.14,i*0.08,'triangle',0.1)); }
     else if(kind==='overload'){ [300,260,220].forEach((f,i)=>beep(f,0.14,i*0.09,'sawtooth',0.07)); }
     else if(kind==='combo'){ [523,659,784,1046,1318].forEach((f,i)=>beep(f,0.12,i*0.06,'triangle',0.1)); }
+    else if(kind==='bite'){ beep(240,0.06,0,'square',0.05); beep(210,0.05,0.05,'square',0.04); }
   }
   function vibrate(pattern){
     try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
