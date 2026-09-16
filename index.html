@@ -1068,18 +1068,29 @@
       line = pick(LINES[kind]); soundKind = kind;
     }
 
-    render(mood);
-    bounce();
-    playEffect(kind);
-    if(isJackpot || isCombo) playJackpot();
-    showBubble(line);
-    playSound(soundKind);
-    if(isCombo) vibrate([10,30,10,30,10]);
-    else if(isOverload) vibrate([15,30,15,30]);
-    else if(isJackpot) vibrate([10,20,10,20,10]);
-    else vibrate(12);
-    clearTimeout(interact._t);
-    interact._t = setTimeout(()=>render(computeMood(state,false)), isOverload?2600:2200);
+    const react = () => {
+      render(mood);
+      bounce();
+      if(kind!=='feed') playEffect(kind);
+      if(isJackpot || isCombo) playJackpot();
+      showBubble(line);
+      playSound(soundKind);
+      if(isCombo) vibrate([10,30,10,30,10]);
+      else if(isOverload) vibrate([15,30,15,30]);
+      else if(isJackpot) vibrate([10,20,10,20,10]);
+      else vibrate(12);
+      clearTimeout(interact._t);
+      interact._t = setTimeout(()=>render(computeMood(state,false)), isOverload?2600:2200);
+    };
+
+    if(kind==='feed'){
+      // real feeding: the food travels to the mouth and gets eaten first, reaction follows
+      playFeedAnimation();
+      vibrate(8);
+      setTimeout(react, FEED_DURATION);
+    } else {
+      react();
+    }
   }
 
   function tick(){
