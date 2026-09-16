@@ -535,27 +535,46 @@
         </g>
       </g>
 
-      <g class="fx fx-feed-a-el" transform="translate(100,150)">
-        <circle r="7" fill="#ff8fa3"/>
-        <circle r="7" fill="#ffd15c" transform="translate(6,-2)"/>
+      <g class="feed-scene" transform="translate(100,140)">
+        <g class="feed-travel">
+          <g class="feed-item feed-item-a">
+            <circle r="12" fill="#ff8fa3"/>
+            <path d="M-12,0 L-19,-5 M12,0 L19,-5" stroke="#ff8fa3" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <g class="feed-item feed-item-b">
+            <circle r="12" fill="#e8b874"/>
+            <circle r="2" cx="-4" cy="-3" fill="#7a5230"/>
+            <circle r="2" cx="4" cy="2" fill="#7a5230"/>
+            <circle r="1.8" cx="-1" cy="5" fill="#7a5230"/>
+          </g>
+          <g class="feed-item feed-item-c">
+            <circle r="11" fill="#c3e88a"/>
+            <path d="M0,-11 C4,-14 8,-11 6,-7 C10,-6 10,-1 6,0" fill="none" stroke="#7cb955" stroke-width="1.6"/>
+          </g>
+        </g>
+        <ellipse class="chomp" rx="9" ry="7"/>
       </g>
-      <g class="fx fx-feed-b-el" transform="translate(100,148)">
-        <circle class="crumb" r="3" fill="#c98a4b" transform="translate(-10,-4)"/>
-        <circle class="crumb" r="3" fill="#c98a4b" transform="translate(9,-9)"/>
-        <circle class="crumb" r="3" fill="#c98a4b" transform="translate(1,7)"/>
-      </g>
+
       <g class="fx fx-play-a-el" transform="translate(152,120)">
-        <circle r="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
-        <circle r="2" fill="var(--ink)"/>
+        <g class="fx-inner">
+          <circle r="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <circle r="2" fill="var(--ink)"/>
+        </g>
       </g>
       <g class="fx fx-play-b-el" transform="translate(100,110)">
-        <polygon points="0,-12 3,-3 12,-3 5,3 8,12 0,6 -8,12 -5,3 -12,-3 -3,-3" fill="#ffd15c"/>
+        <g class="fx-inner">
+          <polygon points="0,-12 3,-3 12,-3 5,3 8,12 0,6 -8,12 -5,3 -12,-3 -3,-3" fill="#ffd15c"/>
+        </g>
       </g>
       <g class="fx fx-pet-a-el" transform="translate(100,88)">
-        <path d="M-13,0 c0,-7 11,-7 13,-2 c2,-5 13,-5 13,2 c0,7 -13,13 -13,13 c0,0 -13,-6 -13,-13 Z" fill="#ff8fa3"/>
+        <g class="fx-inner">
+          <path d="M-13,0 c0,-7 11,-7 13,-2 c2,-5 13,-5 13,2 c0,7 -13,13 -13,13 c0,0 -13,-6 -13,-13 Z" fill="#ff8fa3"/>
+        </g>
       </g>
       <g class="fx fx-pet-b-el" transform="translate(100,116)">
-        <circle r="60" fill="none" stroke="#ff8fa3" stroke-width="3"/>
+        <g class="fx-inner">
+          <circle r="60" fill="none" stroke="#ff8fa3" stroke-width="3"/>
+        </g>
       </g>
       <g class="fx fx-jackpot-el" transform="translate(100,110)">
         <circle class="confetti c1" r="4" fill="#ff8fa3"/>
