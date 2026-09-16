@@ -256,19 +256,42 @@
   .poop-inner.cleaning{animation:poopClean 0.3s ease forwards;}
   @keyframes poopClean{to{transform:scale(0) rotate(25deg); opacity:0;}}
 
-  /* per-action micro effects — 2 random variants each, plus rare jackpot confetti */
+  /* per-action micro effects — nested wrapper so the CSS-animated transform never clobbers
+     the outer element's position-setting transform attribute (they're different elements) */
   .fx{display:none; pointer-events:none;}
-  .creature.fx-feed-a .fx-feed-a-el{display:block; animation:fxFood 0.9s ease forwards;}
-  .creature.fx-feed-b .fx-feed-b-el{display:block; animation:fxCrumbs 0.9s ease forwards;}
-  .creature.fx-play-a .fx-play-a-el{display:block; animation:fxBall 0.9s ease forwards;}
-  .creature.fx-play-b .fx-play-b-el{display:block; animation:fxStar 0.9s ease forwards;}
-  .creature.fx-pet-a .fx-pet-a-el{display:block; animation:fxHearts 0.9s ease forwards;}
-  .creature.fx-pet-b .fx-pet-b-el{display:block; animation:fxRing 0.9s ease forwards;}
-  @keyframes fxFood{0%{opacity:0; transform:translateY(6px) scale(0.5);}30%{opacity:1; transform:translateY(-4px) scale(1.1);}70%{opacity:1;}100%{opacity:0; transform:translateY(-16px) scale(0.8);}}
-  @keyframes fxCrumbs{0%{opacity:0; transform:scale(0.3);}30%{opacity:1; transform:scale(1);}100%{opacity:0; transform:scale(1) translateY(12px);}}
+  .creature.fx-play-a .fx-play-a-el{display:block;}
+  .creature.fx-play-a .fx-play-a-el .fx-inner{animation:fxBall 0.9s ease forwards;}
+  .creature.fx-play-b .fx-play-b-el{display:block;}
+  .creature.fx-play-b .fx-play-b-el .fx-inner{animation:fxStar 0.9s ease forwards;}
+  .creature.fx-pet-a .fx-pet-a-el{display:block;}
+  .creature.fx-pet-a .fx-pet-a-el .fx-inner{animation:fxHearts 0.9s ease forwards;}
+  .creature.fx-pet-b .fx-pet-b-el{display:block;}
+  .creature.fx-pet-b .fx-pet-b-el .fx-inner{animation:fxRing 0.9s ease forwards;}
   @keyframes fxBall{0%{opacity:0; transform:translate(0,0) scale(0.6);}20%{opacity:1;}50%{transform:translate(-8px,-20px) scale(1);}75%{transform:translate(8px,-6px) scale(0.95);}100%{opacity:0; transform:translate(0,6px) scale(0.7);}}
   @keyframes fxStar{0%{opacity:0; transform:translate(-36px,4px) rotate(0) scale(0.6);}30%{opacity:1;}100%{opacity:0; transform:translate(36px,-14px) rotate(220deg) scale(1);}}
   @keyframes fxHearts{0%{opacity:0; transform:translateY(4px) scale(0.5);}30%{opacity:1;}100%{opacity:0; transform:translateY(-30px) scale(1.05);}}
+  @keyframes fxRing{0%{opacity:0.9; transform:scale(0.4);}100%{opacity:0; transform:scale(2.1);}}
+
+  /* real feeding sequence: food travels up from below to the mouth, then gets eaten */
+  .feed-item{display:none;}
+  .feed-item.show-item{display:block;}
+  .feed-travel{opacity:0;}
+  .chomp{opacity:0; fill:var(--ink);}
+  .creature.feeding .feed-travel{animation:feedTravel 0.62s cubic-bezier(.2,.7,.3,1) forwards;}
+  .creature.feeding .chomp{animation:chompFlash 0.62s ease-out forwards;}
+  @keyframes feedTravel{
+    0%{opacity:0; transform:translate(0,74px) scale(0.65);}
+    18%{opacity:1;}
+    68%{opacity:1; transform:translate(0,0) scale(1);}
+    82%{opacity:1; transform:translate(0,-3px) scale(1.15);}
+    100%{opacity:0; transform:translate(0,-3px) scale(0.15);}
+  }
+  @keyframes chompFlash{
+    0%,52%{opacity:0; transform:scale(0.3);}
+    64%{opacity:1; transform:scale(1);}
+    80%{opacity:1; transform:scale(0.8);}
+    100%{opacity:0; transform:scale(0.3);}
+  }
   @keyframes fxRing{0%{opacity:0.9; transform:scale(0.4);}100%{opacity:0; transform:scale(2.1);}}
 
   .creature.fx-jackpot .fx-jackpot-el{display:block;}
