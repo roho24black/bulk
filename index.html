@@ -971,6 +971,20 @@
     setTimeout(()=>c.classList.remove(cls), 900);
   }
 
+  const FEED_DURATION = 620;
+  function playFeedAnimation(){
+    const c = document.getElementById('creature');
+    const variants = ['a','b','c'];
+    const variant = pick(variants);
+    document.querySelectorAll('.feed-item').forEach(el=>el.classList.remove('show-item'));
+    const item = document.querySelector('.feed-item-' + variant);
+    if(item) item.classList.add('show-item');
+    c.classList.remove('feeding'); void c.offsetWidth;
+    c.classList.add('feeding');
+    setTimeout(()=>playSound('bite'), FEED_DURATION*0.55);
+    setTimeout(()=>c.classList.remove('feeding'), FEED_DURATION + 80);
+  }
+
   function playJackpot(){
     const c = document.getElementById('creature');
     c.classList.remove('fx-jackpot'); void c.offsetWidth;
