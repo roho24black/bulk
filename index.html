@@ -320,7 +320,7 @@
     box-shadow:0 10px 22px rgba(0,0,0,0.10);
     border:2.5px solid var(--body2);
     opacity:0; transform:translateY(-6px) scale(0.95);
-    transition:opacity 0.25s, transform 0.25s, border-color 0.4s;
+    transition:opacity 0.3s ease, transform 0.3s ease, border-color 0.4s;
   }
   #bubble.show{opacity:1; transform:translateY(0) scale(1);}
 
@@ -940,10 +940,20 @@
 
   function showBubble(text){
     const b = document.getElementById('bubble');
-    b.textContent = text;
-    b.classList.add('show');
     clearTimeout(showBubble._t);
-    showBubble._t = setTimeout(()=>b.classList.remove('show'), 2600);
+    clearTimeout(showBubble._swapT);
+    const apply = () => {
+      b.textContent = text;
+      b.classList.add('show');
+      showBubble._t = setTimeout(()=>b.classList.remove('show'), 2900);
+    };
+    if(b.classList.contains('show')){
+      // cross-fade: let the old line fade out before the new one fades in, instead of an abrupt swap
+      b.classList.remove('show');
+      showBubble._swapT = setTimeout(apply, 190);
+    } else {
+      apply();
+    }
   }
 
   function bounce(){
