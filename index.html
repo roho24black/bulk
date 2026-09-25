@@ -188,7 +188,8 @@
   .body-shape{display:none; fill:url(#bodyGrad); stroke:var(--ink); stroke-width:4.5; stroke-opacity:0.8; stroke-linejoin:round;}
   .creature.species-drop .body-drop{display:block;}
   .creature.species-spike .body-spike{display:block;}
-  .creature.species-cloud .body-cloud{display:block;}
+  .creature.species-cloud .body-cloud{display:block; stroke:none;}
+  .creature.species-cloud .body-cloud-outline{display:block; fill:var(--ink); fill-opacity:0.8; stroke:none;}
   .creature.species-leaf .body-leaf{display:block;}
   .creature.species-flame .body-flame{display:block;}
   .creature.species-crystal .body-crystal{display:block; stroke:white; stroke-width:1.5; stroke-opacity:0.5;}
@@ -506,6 +507,15 @@
         <g id="bodyGroup">
           <circle class="body-shape body-drop" cx="100" cy="116" r="72"/>
           <polygon class="body-shape body-spike" points="100,34 133,73 180,92 153,135 149,186 100,174 51,186 47,135 20,92 67,73"/>
+          <g class="body-shape body-cloud-outline">
+            <circle cx="100" cy="116" r="48.5"/>
+            <circle cx="134" cy="116" r="31.5"/>
+            <circle cx="117" cy="145" r="31.5"/>
+            <circle cx="83" cy="145" r="31.5"/>
+            <circle cx="66" cy="116" r="31.5"/>
+            <circle cx="83" cy="87" r="31.5"/>
+            <circle cx="117" cy="87" r="31.5"/>
+          </g>
           <g class="body-shape body-cloud">
             <circle cx="100" cy="116" r="46"/>
             <circle cx="134" cy="116" r="29"/>
