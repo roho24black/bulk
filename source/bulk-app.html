@@ -384,6 +384,44 @@
   #nightOverlay .moon{position:absolute; top:10%; right:11%; width:34px; height:34px; border-radius:50%; box-shadow:inset -10px 4px 0 0 #fff6c9;}
   body.sleeping #label, body.sleeping #header{color:#dfe6ff; opacity:0.8;}
 
+  /* water while washing */
+  .fx-wash-el .shower-head{opacity:0; animation:showerShow 1.7s ease-out forwards;}
+  @keyframes showerShow{0%{opacity:0; transform:translateY(-14px);}12%{opacity:1; transform:translateY(0);}85%{opacity:1;}100%{opacity:0; transform:translateY(-8px);}}
+  .fx-wash-el .wdrop{stroke:#5fbfff; stroke-width:3.2; stroke-linecap:round; fill:none; opacity:0; animation:wdropFall 0.5s linear 3;}
+  @keyframes wdropFall{0%{opacity:0; transform:translateY(0);}15%{opacity:1;}100%{opacity:0; transform:translateY(150px);}}
+  .creature.fx-wash #reactGroup{filter:saturate(1.15) brightness(1.06);}
+
+  /* wash button state: pulses when he is dirty, dims when there is nothing to wash */
+  .btn.needs{animation:needsPulse 1.5s ease-in-out infinite;}
+  @keyframes needsPulse{0%,100%{box-shadow:0 8px 18px rgba(0,0,0,0.12), 0 0 0 0 rgba(255,140,80,0.6);}50%{box-shadow:0 8px 18px rgba(0,0,0,0.12), 0 0 0 9px rgba(255,140,80,0);}}
+  .btn.dim{opacity:0.55;}
+
+  /* mini-games */
+  .game-panel{background:white; color:#2c3a36; border-radius:24px; width:min(92vw,360px); padding:16px; max-height:94vh; display:flex; flex-direction:column; gap:8px; box-shadow:0 24px 48px rgba(0,0,0,0.25); transform:scale(0.94); transition:transform 0.2s;}
+  .overlay.show .game-panel{transform:scale(1);}
+  .game-header{display:flex; align-items:center; justify-content:space-between; font-weight:800; font-size:16px;}
+  #gameClose{border:none; background:#f0f3f2; width:30px; height:30px; border-radius:50%; font-size:14px; cursor:pointer; color:#2c3a36;}
+  #gamePet{width:104px; height:112px; margin:0 auto; flex-shrink:0;}
+  #gamePet svg{overflow:visible;}
+  #gamePet.hiding svg{opacity:0.05;}
+  #gameInfo{text-align:center; font-weight:700; font-size:14px; min-height:20px;}
+  #gameArea{position:relative; min-height:210px;}
+  .catch-area{height:250px; overflow:hidden; border-radius:16px; background:linear-gradient(180deg,#eef4ff,#dbe6ff); touch-action:manipulation;}
+  .fall{position:absolute; top:-46px; font-size:34px; background:none; border:none; padding:4px; cursor:pointer; animation:fallDown linear forwards; touch-action:manipulation; -webkit-user-select:none; user-select:none;}
+  @keyframes fallDown{to{transform:translateY(310px);}}
+  .float-txt{position:absolute; font-weight:800; font-size:18px; color:#2c3a36; pointer-events:none; animation:floatUpTxt 0.6s ease-out forwards;}
+  @keyframes floatUpTxt{from{opacity:1; transform:translateY(0);}to{opacity:0; transform:translateY(-28px);}}
+  .cups{display:flex; justify-content:center; gap:12px; margin-top:26px;}
+  .cup, .rps{font-size:40px; width:84px; height:84px; border-radius:20px; border:3px solid #cfe3d8; background:#f2faf5; cursor:pointer; padding:0;}
+  .cup:disabled{opacity:0.6;}
+  .cup:active, .rps:active{transform:scale(0.94);}
+  .rps-res{text-align:center; font-weight:700; min-height:44px; margin:14px 0 10px; font-size:15px;}
+  .rps-btns{display:flex; justify-content:center; gap:12px;}
+  .game-result{text-align:center; display:flex; flex-direction:column; gap:10px; align-items:center; padding:14px 6px;}
+  .gr-title{font-size:22px; font-weight:800;}
+  .gr-sub{font-size:14px; opacity:0.75;}
+  .gr-btns{display:flex; gap:10px; margin-top:6px;}
+
   /* speech bubble */
   #bubbleWrap{
     min-height:70px; display:flex; align-items:flex-start; justify-content:center;
@@ -723,6 +761,15 @@
         <g transform="translate(-44,-8)"><circle class="bub" r="6"/></g>
         <g transform="translate(46,-14)"><circle class="bub" r="7"/></g>
         <g transform="translate(6,-40)"><circle class="bub" r="8"/></g>
+        <g transform="translate(0,-112)"><g class="shower-head"><rect x="-18" y="-6" width="36" height="11" rx="5.5" fill="#9aa7b5"/><rect x="-3" y="-20" width="6" height="15" fill="#9aa7b5"/></g></g>
+        <g transform="translate(-46,-100)"><path class="wdrop" style="animation-delay:0.00s" d="M0,0 v11"/></g>
+        <g transform="translate(-33,-100)"><path class="wdrop" style="animation-delay:0.09s" d="M0,0 v11"/></g>
+        <g transform="translate(-20,-100)"><path class="wdrop" style="animation-delay:0.18s" d="M0,0 v11"/></g>
+        <g transform="translate(-7,-100)"><path class="wdrop" style="animation-delay:0.27s" d="M0,0 v11"/></g>
+        <g transform="translate(6,-100)"><path class="wdrop" style="animation-delay:0.00s" d="M0,0 v11"/></g>
+        <g transform="translate(19,-100)"><path class="wdrop" style="animation-delay:0.09s" d="M0,0 v11"/></g>
+        <g transform="translate(32,-100)"><path class="wdrop" style="animation-delay:0.18s" d="M0,0 v11"/></g>
+        <g transform="translate(45,-100)"><path class="wdrop" style="animation-delay:0.27s" d="M0,0 v11"/></g>
       </g>
       <g class="fx fx-jackpot-el" transform="translate(100,110)">
         <circle class="confetti c1" r="4" fill="#ff8fa3"/>
@@ -736,6 +783,26 @@
   </div>
   <div id="bubbleWrap"><div id="bubble"></div></div>
   <div id="label"></div>
+</div>
+
+<div id="gameMenuOverlay" class="overlay">
+  <div class="menu-card">
+    <button class="menu-row" id="gmPlay">🎾&nbsp;&nbsp;Просто поиграть</button>
+    <div class="menu-sep"></div>
+    <button class="menu-row" data-game="catch">⭐&nbsp;&nbsp;Поймай звёздочки</button>
+    <button class="menu-row" data-game="hide">🫣&nbsp;&nbsp;Прятки</button>
+    <button class="menu-row" data-game="rps">✊&nbsp;&nbsp;Камень-ножницы-бумага</button>
+    <button class="menu-cancel" id="gmCancel">Отмена</button>
+  </div>
+</div>
+
+<div id="gameOverlay" class="overlay">
+  <div class="game-panel">
+    <div class="game-header"><span id="gameTitle"></span><button id="gameClose">✕</button></div>
+    <div id="gamePet"></div>
+    <div id="gameInfo"></div>
+    <div id="gameArea"></div>
+  </div>
 </div>
 
 <div id="buttons">
@@ -962,6 +1029,22 @@
     wakeInterrupt: ["Тсс! Не видишь — я сплю!", "Кто меня разбудил?!", "Дай доспать!", "Ммм... что? Уже утро?", "Ой, я же спал!"]
   };
 
+  LINES.feed.push("Ещё кусочек — и я в раю.","Это мой новый любимый вкус.","Пузик доволен на все сто!","Я бы так каждый день!");
+  LINES.play.push("Ещё чуть-чуть — и я побью рекорд!","Вот это я называю весельем!","Ты — лучший напарник!","Побежали дальше!");
+  LINES.pet.push("Ты — самое тёплое место на свете.","Мурлыкаю внутри, слышишь?","Так бы и сидел весь день.","Твои руки — волшебные.");
+  LINES.poke.push("Кто-то тыкает, а я мурчу.","Тыкни ещё, я коллекционирую тыки!","Ай-яй, щекотка!","Не тыкай в глаз — я моргну!");
+  LINES.idle.push("Придумал новый танец. Показать?","Считаю секунды до вкусняшки.","Ты сегодня отлично выглядишь.","Подумал: а не устроить ли вечеринку?","Тренируюсь быть милым. Получается?","Хочу мороженого, хоть и не знаю, что это.");
+  LINES.washClean = [
+    "Я и так чистый — смотри, сверкаю!", "Мыться не надо, я только что из ванны!", "Вода пока не нужна — я чистюля.",
+    "Куда мыть? Я уже блестящий!", "Давай лучше поиграем, я чистый!", "Не мой, а то смою всю красоту!",
+    "Чище не бывает, честное слово!", "Мылом по чистому? Ну уж нет!"
+  ];
+  const GAME_LINES = {
+    great: ["Вот это игра! Ты просто мастер!", "Я в восторге! Давай ещё как-нибудь!", "Ты лучший игрок на свете!"],
+    ok:    ["Неплохо! Мне понравилось.", "Хорошая игра! Давай ещё.", "Весело было!"],
+    meh:   ["Ничего, в следующий раз получится!", "Главное — участие!", "Мне всё равно понравилось!"]
+  };
+
   const MILESTONES = {
     10:  "10 раз! Мы уже друзья.",
     25:  "25 раз! Ты ко мне явно привязался.",
@@ -990,17 +1073,33 @@
 
   function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-  // remembers recently shown lines per pool so the same phrase does not come back right away
-  const recent = {};
+  // shuffle-bag per pool + a global memory of the last shown lines (kept between sessions),
+  // so a phrase does not come back until everything else in the pool has been used
+  const RECENT_KEY = 'bulk_recent_v1';
+  let globalRecent = [];
+  try{ globalRecent = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); }catch(e){}
+  const bags = {};
   function pickFresh(key, arr){
     if(!arr || !arr.length) return '';
-    const hist = recent[key] || (recent[key] = []);
-    const avoid = Math.min(3, arr.length - 1);
-    let line, tries = 0;
-    do { line = arr[Math.floor(Math.random()*arr.length)]; tries++; }
-    while(avoid > 0 && hist.slice(-avoid).indexOf(line) !== -1 && tries < 14);
-    hist.push(line);
-    if(hist.length > 6) hist.shift();
+    const sig = arr.length + '|' + arr[0];
+    let bag = bags[key];
+    if(!bag || bag.sig !== sig){ bag = bags[key] = {sig: sig, left: []}; }
+    if(!bag.left.length){
+      bag.left = arr.map((_,i)=>i);
+      for(let i=bag.left.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        const t = bag.left[i]; bag.left[i] = bag.left[j]; bag.left[j] = t;
+      }
+    }
+    let idx = -1;
+    for(let k=bag.left.length-1;k>=0;k--){
+      if(globalRecent.indexOf(arr[bag.left[k]]) === -1){ idx = k; break; }
+    }
+    if(idx === -1) idx = bag.left.length - 1;
+    const line = arr[bag.left.splice(idx,1)[0]];
+    globalRecent.push(line);
+    if(globalRecent.length > 26) globalRecent.shift();
+    try{ localStorage.setItem(RECENT_KEY, JSON.stringify(globalRecent)); }catch(e){}
     return line;
   }
 
@@ -1052,6 +1151,7 @@
   let cracking = false;
   let tickStarted = false;
   let idleStarted = false;
+  let gameOpen = false;
   let sleeping = false;
   let sleepStart = 0;
   let lastAction = Date.now();
@@ -1137,7 +1237,7 @@
       species: sp.id, trait: tr.id, nickname: null,
       createdAt: now, lastInteraction: now,
       lastFed: now, lastPlayed: now, lastWashed: now, feedCount: 0, nextPoopAt: null,
-      lastStageSeen: 'baby', pokes: 0, hintShown: false,
+      lastStageSeen: 'baby', pokes: 0, hintShown: false, mess: 0, games: {},
       totalInteractions: 0, neglectCount: 0,
       lastOpenDate: todayStr(), streakDays: 1,
       auraUnlocked:false, scarUnlocked:false, accessoryUnlocked:false
@@ -1163,8 +1263,15 @@
     };
   }
 
-  function isDirty(s){
-    return (Date.now()-(s.lastWashed||s.createdAt))/3600000 > 30;
+  function hoursSinceWash(s){ return (Date.now()-(s.lastWashed||s.createdAt))/3600000; }
+  // gets dirty after 30h, or after a lot of eating/playing (crumbs, sweat)
+  function isDirty(s){ return hoursSinceWash(s) > 30 || (s.mess||0) >= 6; }
+  function isClean(s){ return hoursSinceWash(s) < 10 && (s.mess||0) < 3; }
+  function updateWashBtn(){
+    const b = document.getElementById('btnWash');
+    if(!b || !state) return;
+    b.classList.toggle('needs', isDirty(state));
+    b.classList.toggle('dim', isClean(state));
   }
 
   function stageOf(s){
@@ -1197,6 +1304,7 @@
     c.classList.toggle('has-accessory', s.accessoryUnlocked);
     c.classList.toggle('has-poop', poopVisible);
     c.classList.toggle('is-dirty', isDirty(s));
+    updateWashBtn();
   }
 
   function render(mood){
@@ -1262,15 +1370,15 @@
     timedClass('fx-' + kind + '-' + pick(variants), 1000);
   }
   function playPokeFx(){ timedClass('fx-poke', 750); }
-  function playWashFx(){ timedClass('fx-wash', 1700); }
+  function playWashFx(){ timedClass('fx-wash', 1900); }
   function playJackpot(){ timedClass('fx-jackpot', 1000); }
 
   const FEED_DURATION = 620;
   const WASH_DURATION = 720;
   function playFeedAnimation(){
     const c = document.getElementById('creature');
-    document.querySelectorAll('.feed-item').forEach(el=>el.classList.remove('show-item'));
-    const item = document.querySelector('.feed-item-' + pick(['a','b','c']));
+    c.querySelectorAll('.feed-item').forEach(el=>el.classList.remove('show-item'));
+    const item = c.querySelector('.feed-item-' + pick(['a','b','c']));
     if(item) item.classList.add('show-item');
     c.classList.remove('feeding'); void c.offsetWidth;
     c.classList.add('feeding');
@@ -1293,7 +1401,7 @@
     if(!state || !state.nextPoopAt) return;
     if(sleeping){ wakeUp('interrupt'); return; }
     lastAction = Date.now();
-    const inner = document.querySelector('.poop-inner');
+    const inner = document.getElementById('creature').querySelector('.poop-inner');
     if(inner) inner.classList.add('cleaning');
     state.nextPoopAt = null;
     saveRoster();
@@ -1363,6 +1471,18 @@
     playSound('idle');
   }
 
+  function washRefuse(){
+    lastAction = Date.now();
+    combo.kind = null; combo.count = 0;
+    render('shock');
+    playReact('dodge');
+    showBubble(pickFresh('washClean', LINES.washClean));
+    playSound('shock');
+    vibrate(8);
+    clearTimeout(interact._t);
+    interact._t = setTimeout(()=>render(computeMood(state,false)), 2200);
+  }
+
   function sleepTalk(){
     showBubble(pickFresh('sleepTalk', LINES.sleepTalk));
     playSound('idle');
@@ -1372,7 +1492,7 @@
     setTimeout(()=>{
       try{
         const hatchOpen = !document.getElementById('hatch').classList.contains('hidden');
-        if(state && !document.hidden && !reunion && !hatchOpen){
+        if(state && !document.hidden && !reunion && !hatchOpen && !gameOpen){
           if(sleeping){ if(Math.random()<0.7) sleepTalk(); }
           else if(Date.now()-lastAction>7000 && Math.random()<0.6) idleFlourish();
         }
@@ -1429,6 +1549,7 @@
   function interact(kind){
     if(!state) return;
     if(sleeping){ wakeUp('interrupt'); return; }
+    if(kind==='wash' && isClean(state)){ washRefuse(); return; }
     const now = Date.now();
     lastAction = now;
     state.totalInteractions++;
@@ -1437,13 +1558,14 @@
     const washedRecently = state.lastWashed && (now - state.lastWashed) < 2*3600000;
     if(kind==='feed'){
       state.lastFed = now;
+      state.mess = (state.mess||0) + 1;
       state.feedCount = (state.feedCount||0)+1;
       if(state.feedCount % 3 === 0 && !state.nextPoopAt){
         state.nextPoopAt = now + (2 + Math.random()*4)*3600000;
       }
     }
-    if(kind==='play') state.lastPlayed = now;
-    if(kind==='wash') state.lastWashed = now;
+    if(kind==='play'){ state.lastPlayed = now; state.mess = (state.mess||0) + 1; }
+    if(kind==='wash'){ state.lastWashed = now; state.mess = 0; }
     if(kind==='poke') state.pokes = (state.pokes||0)+1;
     if(state.totalInteractions>=30) state.auraUnlocked = true;
     if(state.streakDays>=5) state.accessoryUnlocked = true;
@@ -1526,6 +1648,241 @@
     if(reunion || !state) return;
     render(computeMood(state,false));
     checkGrowth();
+  }
+
+  /* ---------- mini-games ---------- */
+  let gameTimers = [];
+  let gamePetClone = null;
+  let gameResult = null;
+  let currentGame = null;
+  function gtimeout(fn, ms){ const t = setTimeout(fn, ms); gameTimers.push(t); return t; }
+  function gclear(){ gameTimers.forEach(t=>{ clearTimeout(t); clearInterval(t); }); gameTimers = []; }
+  function gamePetMood(m, revertMs){
+    if(!gamePetClone || !state) return;
+    gamePetClone.setAttribute('class', 'creature species-' + state.species + ' mood-' + m + ' stage-' + stageOf(state));
+    if(revertMs) gtimeout(()=>gamePetMood('happy'), revertMs);
+  }
+  function openGameMenu(){
+    if(sleeping){ wakeUp('interrupt'); return; }
+    if(!state) return;
+    document.getElementById('gameMenuOverlay').classList.add('show');
+  }
+  function closeGameMenu(){ document.getElementById('gameMenuOverlay').classList.remove('show'); }
+
+  function startGame(name){
+    closeGameMenu();
+    gclear();
+    gameResult = null; gameOpen = true; currentGame = name; lastAction = Date.now();
+    const pet = document.getElementById('gamePet');
+    pet.innerHTML = ''; pet.classList.remove('hiding');
+    const clone = document.getElementById('creature').cloneNode(true);
+    clone.removeAttribute('id');
+    const dd = clone.querySelector('defs'); if(dd) dd.remove();
+    clone.style.width = '100%'; clone.style.height = '100%';
+    pet.appendChild(clone);
+    gamePetClone = clone;
+    gamePetMood('happy');
+    const titles = {catch:'Поймай звёздочки', hide:'Прятки', rps:'Камень-ножницы-бумага'};
+    document.getElementById('gameTitle').textContent = titles[name];
+    document.getElementById('gameOverlay').classList.add('show');
+    ({catch:gameCatch, hide:gameHide, rps:gameRps})[name]();
+  }
+  function closeGame(){
+    gclear();
+    gameOpen = false; gamePetClone = null;
+    document.getElementById('gameOverlay').classList.remove('show');
+    document.getElementById('gamePet').innerHTML = '';
+    if(gameResult && state){ const r = gameResult; gameResult = null; afterGame(r); }
+    if(state) render(computeMood(state,false));
+  }
+  function afterGame(r){
+    const line = pickFresh('game_' + r.tier, GAME_LINES[r.tier]);
+    flashMood(r.tier==='meh' ? 'playful' : 'ecstatic', 2600);
+    bounce();
+    playReact(r.tier==='great' ? 'spin' : 'hop2');
+    if(r.tier==='great') playJackpot();
+    showBubble(line);
+  }
+
+  function finishGame(name, score, tier, summary){
+    const now = Date.now();
+    state.lastPlayed = now; state.lastInteraction = now;
+    state.totalInteractions++;
+    state.mess = (state.mess||0) + 1;
+    state.games = state.games || {};
+    const best = state.games[name] || 0;
+    const isNew = score > best;
+    if(isNew) state.games[name] = score;
+    if(state.totalInteractions>=30) state.auraUnlocked = true;
+    saveRoster();
+    gameResult = {tier: tier};
+    document.getElementById('gamePet').classList.remove('hiding');
+    gamePetMood(tier==='meh' ? 'sad' : 'ecstatic');
+    playSound(tier==='great' ? 'combo' : (tier==='ok' ? 'jackpot' : 'shock'));
+    vibrate(tier==='meh' ? 10 : [10,20,10,20,10]);
+    const heading = tier==='great' ? 'Отлично!' : (tier==='ok' ? 'Неплохо!' : 'Бывает!');
+    const area = document.getElementById('gameArea');
+    document.getElementById('gameInfo').textContent = '';
+    area.className = '';
+    area.innerHTML =
+      '<div class="game-result"><div class="gr-title">' + heading + '</div>' +
+      '<div class="gr-sub">' + summary + '</div>' +
+      '<div class="gr-sub">Рекорд: ' + state.games[name] + (isNew && best>0 ? ' — новый!' : '') + '</div>' +
+      '<div class="gr-btns"><button class="confirm-btn secondary" id="grClose">Закрыть</button>' +
+      '<button class="confirm-btn primary" id="grAgain">Ещё раз</button></div></div>';
+    document.getElementById('grClose').addEventListener('click', closeGame);
+    document.getElementById('grAgain').addEventListener('click', ()=>{ gameResult = null; startGame(name); });
+  }
+
+  function gameCatch(){
+    const area = document.getElementById('gameArea');
+    const info = document.getElementById('gameInfo');
+    area.className = 'catch-area';
+    area.innerHTML = '';
+    let score = 0, timeLeft = 20, alive = true;
+    const upd = () => { info.textContent = 'Лови ⭐ пальцем, 💩 не трогай!  Счёт: ' + score + ' · ' + timeLeft + ' c'; };
+    upd();
+    const spawn = () => {
+      if(!alive) return;
+      const r = Math.random();
+      const kind = r < 0.14 ? 'gold' : (r < 0.3 ? 'bad' : 'star');
+      const el = document.createElement('button');
+      el.className = 'fall';
+      el.textContent = kind==='gold' ? '🌟' : (kind==='bad' ? '💩' : '⭐');
+      el.style.left = (4 + Math.random()*80) + '%';
+      el.style.animationDuration = (1.7 + Math.random()*1.1) + 's';
+      const hit = (ev) => {
+        ev.preventDefault();
+        if(el.dataset.done || !alive) return;
+        el.dataset.done = '1';
+        const ar = area.getBoundingClientRect(), er = el.getBoundingClientRect();
+        const fl = document.createElement('span');
+        fl.className = 'float-txt';
+        fl.style.left = (er.left - ar.left + 6) + 'px';
+        fl.style.top = (er.top - ar.top) + 'px';
+        if(kind==='bad'){ score = Math.max(0, score-2); fl.textContent = '-2'; gamePetMood('shock', 500); playSound('shock'); }
+        else { const add = kind==='gold' ? 3 : 1; score += add; fl.textContent = '+' + add; gamePetMood('ecstatic', 450); playSound('poke'); }
+        area.appendChild(fl);
+        setTimeout(()=>fl.remove(), 600);
+        el.remove();
+        upd();
+      };
+      el.addEventListener('pointerdown', hit);
+      el.addEventListener('animationend', ()=>el.remove());
+      area.appendChild(el);
+      gtimeout(spawn, Math.max(280, 620 - (20-timeLeft)*16) + Math.random()*260);
+    };
+    spawn();
+    const iv = setInterval(()=>{
+      timeLeft--;
+      upd();
+      if(timeLeft <= 0){
+        clearInterval(iv);
+        alive = false;
+        area.innerHTML = '';
+        finishGame('catch', score, score>=18 ? 'great' : (score>=9 ? 'ok' : 'meh'), 'Поймано очков: ' + score);
+      }
+    }, 1000);
+    gameTimers.push(iv);
+  }
+
+  function gameHide(){
+    const area = document.getElementById('gameArea');
+    const info = document.getElementById('gameInfo');
+    const pet = document.getElementById('gamePet');
+    area.className = '';
+    area.innerHTML = '<div class="cups"></div>';
+    const cupsEl = area.firstChild;
+    const cups = [0,1,2].map(i=>{
+      const b = document.createElement('button');
+      b.className = 'cup'; b.textContent = '🌿';
+      cupsEl.appendChild(b);
+      return b;
+    });
+    let round = 0, found = 0, hideIdx = 0, tries = 2, busy = false;
+    const setInfo = () => { info.textContent = 'Раунд ' + round + '/5 · Найдено: ' + found + ' · Где я спрятался?'; };
+    const next = () => {
+      round++;
+      if(round > 5){
+        finishGame('hide', found, found>=4 ? 'great' : (found>=2 ? 'ok' : 'meh'), 'Найдено: ' + found + ' из 5');
+        return;
+      }
+      hideIdx = Math.floor(Math.random()*3); tries = 2; busy = false;
+      cups.forEach(c=>{ c.textContent = '🌿'; c.disabled = false; });
+      pet.classList.add('hiding');
+      gamePetMood('happy');
+      setInfo();
+    };
+    cups.forEach((c,i)=>{
+      c.addEventListener('click', ()=>{
+        if(busy || c.disabled) return;
+        if(i === hideIdx){
+          busy = true; found++;
+          c.textContent = '🎉';
+          pet.classList.remove('hiding');
+          gamePetMood('ecstatic');
+          playSound('jackpot');
+          gtimeout(next, 1100);
+        } else {
+          tries--;
+          c.textContent = '❌'; c.disabled = true;
+          gamePetMood('silly', 500);
+          playSound('shock');
+          if(tries === 0){
+            busy = true;
+            cups[hideIdx].textContent = '🫣';
+            pet.classList.remove('hiding');
+            gamePetMood('shock');
+            gtimeout(next, 1250);
+          }
+        }
+      });
+    });
+    next();
+  }
+
+  function gameRps(){
+    const area = document.getElementById('gameArea');
+    const info = document.getElementById('gameInfo');
+    area.className = '';
+    area.innerHTML = '<div class="rps-res" id="rpsRes">Выбирай!</div><div class="rps-btns"></div>';
+    const opts = ['✊','✋','✌️'];
+    const btns = opts.map((o,i)=>{
+      const b = document.createElement('button');
+      b.className = 'rps'; b.textContent = o;
+      area.lastChild.appendChild(b);
+      return b;
+    });
+    let round = 1, wins = 0, busy = false;
+    const setInfo = () => { info.textContent = 'Раунд ' + round + '/5 · Побед: ' + wins; };
+    setInfo();
+    btns.forEach((b,i)=>{
+      b.addEventListener('click', ()=>{
+        if(busy) return;
+        busy = true;
+        const pc = Math.floor(Math.random()*3);
+        let res;
+        if(i === pc) res = 'draw';
+        else if((i===0 && pc===2) || (i===1 && pc===0) || (i===2 && pc===1)) res = 'win';
+        else res = 'lose';
+        const res_el = document.getElementById('rpsRes');
+        if(res==='win'){ wins++; res_el.textContent = opts[i] + ' против ' + opts[pc] + ' — ты выиграл!'; gamePetMood('shock'); playSound('poke'); }
+        else if(res==='lose'){ res_el.textContent = opts[i] + ' против ' + opts[pc] + ' — я выиграл!'; gamePetMood('ecstatic'); playSound('jackpot'); }
+        else { res_el.textContent = opts[i] + ' против ' + opts[pc] + ' — ничья!'; gamePetMood('silly'); playSound('idle'); }
+        setInfo();
+        gtimeout(()=>{
+          round++;
+          if(round > 5){
+            finishGame('rps', wins, wins>=4 ? 'great' : (wins>=2 ? 'ok' : 'meh'), 'Побед: ' + wins + ' из 5');
+            return;
+          }
+          busy = false;
+          document.getElementById('rpsRes').textContent = 'Выбирай!';
+          gamePetMood('happy');
+          setInfo();
+        }, 1100);
+      });
+    });
   }
 
   /* ---------- header menu ---------- */
@@ -1721,7 +2078,11 @@
     document.getElementById('egg').addEventListener('click', crackEgg);
     document.getElementById('hatchBtn').addEventListener('click', function(){ showMain(false); renderRosterStrip(); });
     document.getElementById('btnFeed').addEventListener('click', ()=>interact('feed'));
-    document.getElementById('btnPlay').addEventListener('click', ()=>interact('play'));
+    document.getElementById('btnPlay').addEventListener('click', openGameMenu);
+    document.getElementById('gmPlay').addEventListener('click', ()=>{ closeGameMenu(); interact('play'); });
+    document.getElementById('gmCancel').addEventListener('click', closeGameMenu);
+    document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click', ()=>startGame(b.getAttribute('data-game'))));
+    document.getElementById('gameClose').addEventListener('click', closeGame);
     document.getElementById('btnPet').addEventListener('click', ()=>interact('pet'));
     document.getElementById('btnWash').addEventListener('click', ()=>interact('wash'));
     document.getElementById('btnSleep').addEventListener('click', toggleSleep);
