@@ -1228,9 +1228,23 @@
     try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
   }
 
+  // new pets should not repeat: avoid species/traits already in the roster and the last few released ones
   function createNewPet(){
-    const sp = weightedPick(SPECIES);
-    const tr = pick(TRAITS);
+    let recentSpecies = [];
+    try{
+      const col = JSON.parse(localStorage.getItem(COLLECTION_KEY) || '[]');
+      recentSpecies = col.slice(-3).map(x=>x.species);
+    }catch(e){}
+    const ownedSpecies = roster.map(p=>p.species);
+    let pool = SPECIES.filter(s=>ownedSpecies.indexOf(s.id)===-1);
+    const fresh = pool.filter(s=>recentSpecies.indexOf(s.id)===-1);
+    if(fresh.length) pool = fresh;
+    if(!pool.length) pool = SPECIES;
+    const sp = weightedPick(pool);
+    const ownedTraits = roster.map(p=>p.trait);
+    let tpool = TRAITS.filter(t=>ownedTraits.indexOf(t.id)===-1);
+    if(!tpool.length) tpool = TRAITS;
+    const tr = pick(tpool);
     const now = Date.now();
     return {
       id: makeId(),
